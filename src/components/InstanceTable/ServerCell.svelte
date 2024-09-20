@@ -19,9 +19,9 @@
     export let server: ServerWithStats
     export let columnKey: string
 
-    const SHOW_EDIT_BUTTON = false
+    const SHOW_EDIT_BUTTON = true
     const SHOW_TRASH_BUTTON = false
-    const SHOW_CONNECT_BUTTON = true
+    const SHOW_CONNECT_BUTTON = false
 
     const dispatch = createEventDispatcher()
 
@@ -105,7 +105,7 @@
                 <Button
                     size="xs"
                     color="none"
-                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1 hidden group-hover:block"
+                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1"
                     on:click={editClicked}
                 >
                     <div class="flex">
@@ -118,7 +118,7 @@
                 <Button
                     size="xs"
                     color="none"
-                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1 hidden group-hover:block"
+                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1"
                     on:click={removeClicked}
                 >
                     <div class="flex">

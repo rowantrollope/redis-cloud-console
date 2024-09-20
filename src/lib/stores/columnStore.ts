@@ -20,15 +20,26 @@ export const availableColumns: Column[] = [
     { key: "actions", label: "Actions" },
 ]
 
+const defaultSelectedColumns = [
+    "name",
+    "host",
+    "provider",
+    "version",
+    "memory",
+    "uptime",
+    "status",
+    "actions"
+];
+
 function createSelectedColumnsStore() {
     const isBrowser = typeof window !== 'undefined';
     
     const getInitialColumns = () => {
         if (isBrowser) {
             const storedColumns = localStorage.getItem("selectedColumns");
-            return storedColumns ? new Set(JSON.parse(storedColumns)) : new Set(availableColumns.map((col) => col.key));
+            return storedColumns ? new Set(JSON.parse(storedColumns)) : new Set(defaultSelectedColumns);
         }
-        return new Set(availableColumns.map((col) => col.key));
+        return new Set(defaultSelectedColumns);
     };
 
     const { subscribe, update } = writable(getInitialColumns());
