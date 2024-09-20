@@ -1,7 +1,7 @@
-// src/lib/redisClient.ts
 import { createClient } from 'redis';
 import type { ServerConfig, ServerStats } from './types/types';
 import type { RedisClientType, RedisClientOptions, RedisModules, RedisScripts, RedisDefaultModules } from 'redis';
+import dotenv from 'dotenv';
 
 interface ClientMap {
   [key: string]: RedisClientType<RedisDefaultModules, RedisScripts>;
@@ -75,4 +75,29 @@ export function parseRedisInfo(info: string): ServerStats {
         }
     }
     return data
+}
+
+// Function to safely get environment variables
+function getEnvVar(key: string): string {
+  if (typeof process !== 'undefined' && process.env && process.env[key]) {
+    return process.env[key] as string;
+  }
+  // For browser environments, you might want to use a different method
+  // This is just an example, adjust according to your setup
+  if (typeof window !== 'undefined' && (window as any).__ENV && (window as any).__ENV[key]) {
+    return (window as any).__ENV[key];
+  }
+  throw new Error(`Environment variable ${key} is not set`);
+}
+dotenv.config()
+export const redisClient = createClient({
+  url: `redis://:${getEnvVar('REDIS_PASSWORD')}@${getEnvVar('REDIS_HOST')}:${getEnvVar('REDIS_PORT')}`,
+});
+
+redisClient.on('error', (err) => console.error('Redis Client Error', err));
+
+// Add this function to connect when needed
+export async function connectRedisClient() {
+  await redisClient.connect();
+  console.log("Connected to Redis");
 }

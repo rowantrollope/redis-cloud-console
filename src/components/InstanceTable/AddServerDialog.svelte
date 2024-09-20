@@ -26,7 +26,7 @@
 </script>
 
 <Modal title="Add Redis Instance" bind:open autoclose>
-    <EditServerPanel {server} />
+    <EditServerPanel bind:server={server} />
 
     <svelte:fragment slot="footer">
         <div class="flex w-full space-x-2">
