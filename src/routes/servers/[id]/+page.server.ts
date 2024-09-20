@@ -1,5 +1,4 @@
 import type { PageServerLoad } from "./$types"
-import { readRedisInfo } from "$lib/redisInfo" // Import the new function
 
 export const load: PageServerLoad = async ({ params, fetch }) => {
     const { id } = params
