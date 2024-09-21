@@ -35,36 +35,37 @@ function decrypt(text: string): string {
  * @returns {Promise<ServerConfig[]>} Array of server configurations.
  */
 export async function getServerConfigs(userID: string): Promise<ServerConfig[]> {
-    try {
-        // Hash the userID to retrieve records
-        const userKey = `user:${userID}:${SERVER_CONFIGS_KEY}`
-        const data = await redisClient.sMembers(userKey)
+    // Hash the userID to retrieve records
+    const userKey = `user:${userID}:${SERVER_CONFIGS_KEY}`
+    const data = await redisClient.sMembers(userKey)
 
-        if (data.length === 0) {
-            return []
-        }
-        const serverConfigs = await redisClient.json.mGet(data, "$")
-        // Decrypt passwords after retrieval
-        const decryptedConfigs = serverConfigs.flat().map(config => {
-            if (
-                typeof config === 'object' &&
-                config !== null &&
-                'password' in config &&
-                typeof config.password === 'string' &&
-                config.password !== null &&
-                config.password !== undefined &&
-                config.password.length > 0
-            ) {
-                config.password = decrypt(config.password);
-            }
-            return config;
-        })
-
-        return decryptedConfigs || []
-    } catch (error) {
-        console.error("Error retrieving server configurations from Redis:", error)
+    if (data.length === 0) {
         return []
     }
+    let serverConfigs = []
+    try {
+        serverConfigs = await redisClient.json.mGet(data, "$")
+    } catch (error) {
+        console.error("Error getting server configurations from Redis:", error)
+        return []
+    }
+
+    // Decrypt passwords after retrieval
+    const decryptedConfigs = serverConfigs.flat().map(config => {
+        if (
+            typeof config === 'object' &&
+            config !== null &&
+            'password' in config &&
+            typeof config.password === 'string' &&
+            config.password.length > 0
+        ) {
+            console.log("decrypting password", config.password)
+            config.password = decrypt(config.password)
+        }
+        return config
+    })
+
+    return decryptedConfigs || []
 }
 
 /**
