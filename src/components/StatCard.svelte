@@ -29,7 +29,7 @@
     </div>
     <p class="text-3xl font-bold dark:text-lime-400 text-slate-900">{value}</p>
     {#if max !== null && current !== null}
-        <Progressbar class="dark:bg-slate-900 h-4 mt-2" progress={progressPercentage} />
+        <Progressbar class="dark:bg-slate-900 mt-2" progress={progressPercentage} />
     {:else if subtitle}
         <p class="subtitle">{subtitle}</p>
     {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte"
     import { selectedColumns, availableColumns } from "$lib/stores/columnStore"
     import {
         servers,
@@ -27,9 +28,10 @@
 
     import ServerCell from "./ServerCell.svelte"
     import AddServerDialog from "./AddServerDialog.svelte"
-    import EditServerDialog from "./EditServerDialog.svelte"
-    import { openRedisInsight } from "$lib/redisInfo"
-
+    import ServerDrawer from "./ServerDrawer.svelte"
+        import {
+        openRedisInsight,
+    } from "$lib/redisInfo"
     // Compute the visible columns based on selectedColumns
     $: visibleColumns = availableColumns.filter((column) =>
         $selectedColumns.has(column.key)
@@ -37,28 +39,36 @@
 
     let columnsModalOpen = false
     let addInstanceModalOpen = false
-    let editInstanceModalOpen: { [key: string]: boolean } = {}
+    let serverDrawerOpen: { [key: string]: boolean } = {}
 
-    function handleUpdate(event: CustomEvent) {
-        updateServer(event.detail)
+    function handleConnect(server: ServerWithStats) {
+        console.log("handleConnect", server)
+        openRedisInsight(server)
+    }
+
+    function handleUpdate(server: ServerWithStats) {
+        updateServer(server.config)
     }
 
     function handleRemove(server: ServerWithStats) {
         removeServer(server.config.id)
     }
-    function handleRowClicked(server: ServerWithStats) {
-        //editInstanceModalOpen[server.config.id] = true
-        openRedisInsight(server)
-    }
+
     function handleRefresh(server: ServerWithStats) {
         refreshServerStats(server.config.id)
     }
-    function handleEdit(server: ServerWithStats) {
-        editInstanceModalOpen[server.config.id] = true
+
+    function handleMenu(server: ServerWithStats) {
+        console.log("handleMenu", server)
+        serverDrawerOpen[server.config.id] = true
     }
 </script>
 
-<Card size="xl" padding="sm" class="shadow-none dark:bg-slate-600 dark:border-slate-200 dark:text-lime-500">
+<Card
+    size="xl"
+    padding="sm"
+    class="shadow-none dark:bg-slate-600 dark:border-slate-200 dark:text-lime-500"
+>
     <div class="flex mb-2 p-2">
         <caption
             class="text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-transparent"
@@ -101,29 +111,27 @@
         </TableHead>
         <TableBody>
             {#each $servers as server}
-                <TableBodyRow
-                    class="cursor-pointer group "
-                    on:click={() => handleRowClicked(server)}
-                >
+                <TableBodyRow class="cursor-pointer group ">
                     {#each visibleColumns as column}
-                        <TableBodyCell tdClass="px-5 py-2 dark:bg-slate-700 dark:group-hover:bg-slate-400 ">
+                        <TableBodyCell
+                            tdClass="px-5 py-2 dark:bg-slate-700 dark:group-hover:bg-slate-400 "
+                        >
                             <ServerCell
                                 {server}
                                 columnKey={column.key}
                                 on:refresh={() => handleRefresh(server)}
-                                on:edit={() => handleEdit(server)}
                                 on:remove={() => handleRemove(server)}
-                                
+                                on:menu={() => handleMenu(server)}
+                                on:update={() => handleUpdate(server)}
                             />
                         </TableBodyCell>
                     {/each}
                 </TableBodyRow>
 
-                <EditServerDialog
-                    bind:open={editInstanceModalOpen[server.config.id]}
+                <ServerDrawer
+                    hidden={!serverDrawerOpen[server.config.id]}
+                    on:connect={() => handleConnect(server)}
                     {server}
-                    on:update={handleUpdate}
-                    on:remove={() => handleRemove(server)}
                 />
             {/each}
         </TableBody>
@@ -135,14 +143,13 @@
         <div class="gap-4 grid grid-cols-3">
             {#each availableColumns as column}
                 <!-- <label class="flex items-center space-x-2" for={column.key}> -->
-                    <Toggle
-                        checked={$selectedColumns.has(column.key)}
-                        id={column.key}
-                        on:change={() =>
-                            selectedColumns.toggleColumn(column.key)}
-                    >
+                <Toggle
+                    checked={$selectedColumns.has(column.key)}
+                    id={column.key}
+                    on:change={() => selectedColumns.toggleColumn(column.key)}
+                >
                     <span>{column.label}</span>
-                    </Toggle>
+                </Toggle>
                 <!-- </label> -->
             {/each}
         </div>

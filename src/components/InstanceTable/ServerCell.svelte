@@ -7,11 +7,15 @@
         getRedisVersion,
         openRedisInsight,
     } from "$lib/redisInfo"
-    import { Button } from "flowbite-svelte"
+    import {
+        Button,
+    } from "flowbite-svelte"
     import {
         ArrowRightOutline,
         EditOutline,
         TrashBinOutline,
+        ChevronDownOutline,
+        DatabaseOutline,
     } from "flowbite-svelte-icons"
     import { calculateKeyspaceHitPercentage } from "$lib/redisInfo"
     import { createEventDispatcher } from "svelte"
@@ -19,21 +23,29 @@
     export let server: ServerWithStats
     export let columnKey: string
 
-    const SHOW_EDIT_BUTTON = true
+    const SHOW_EDIT_BUTTON = false
     const SHOW_TRASH_BUTTON = false
     const SHOW_CONNECT_BUTTON = false
+    const SHOW_ACTION_DRAWER = true
 
     const dispatch = createEventDispatcher()
 
     function refreshClicked() {
         dispatch("refresh")
     }
-    function connectClicked() {
+    function connectClicked(event: MouseEvent) {
+        console.log("connect clicks")
         openRedisInsight(server)
     }
     function editClicked(event: MouseEvent) {
         event.stopPropagation()
         dispatch("edit")
+        // hidden =! hidden
+    }
+    function menuClicked(event: MouseEvent) {
+        event.stopPropagation()
+        dispatch("menu")
+        // hidden =! hidden
     }
     function removeClicked(event: MouseEvent) {
         event.stopPropagation()
@@ -43,9 +55,9 @@
 
 <section class="text-sm">
     {#if columnKey === "name"}
-        <!-- <a href={`/servers/${server.config.id}`} class="anchor hover:underline"> -->
-        {server.config.name}
-        <!-- </a> -->
+        <button class="flex hover:underline" on:click={connectClicked}>
+            {server.config.name}
+        </button>
     {:else if columnKey === "host"}
         <span class="font-mono max-w-36 text-xs overflow-ellipsis line-clamp-1">
             {server.config.host}:{server.config.port}
@@ -90,6 +102,17 @@
             : "N/A"}
     {:else if columnKey === "actions"}
         <div class="flex -space-x-1">
+            {#if SHOW_ACTION_DRAWER}
+                <Button
+                    color="none"
+                    on:click={(event) => {
+                        event.stopPropagation()
+                        menuClicked(event)
+                    }}
+                >
+                    <ChevronDownOutline />
+                </Button>
+            {/if}
             {#if SHOW_CONNECT_BUTTON && server.state === ServerState.SUCCESS}
                 <Button
                     size="xs"

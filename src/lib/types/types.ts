@@ -12,6 +12,7 @@ export interface ServerConfig {
     name: string
     host: string
     port: number
+    username: string
     password?: string
 }
 

@@ -10,7 +10,7 @@
     import FaCheckCircle from "svelte-icons/fa/FaCheckCircle.svelte"
     import StatCard from "../components/StatCard.svelte"
     import InstanceTable from "../components/InstanceTable/InstanceTable.svelte"
-    import { Spinner, Accordion, AccordionItem } from "flowbite-svelte"
+    import { Accordion, AccordionItem } from "flowbite-svelte"
 
     import {
         calculateTotalMemory,
@@ -23,15 +23,16 @@
         calculateTotalKeyspaceMisses,
         formatMemory,
     } from "$lib/redisInfo"
-    import { writable } from "svelte/store"
-    import { ServerState } from "$lib/types/types"
+
     import { initializeServers, servers } from "$lib/stores/serverStore"
+    import type { ServerConfig } from "$lib/types/types"
 
     export let data: {
-        initialServers: ServerConfigs[]
+        initialServers: ServerConfig[]
     }
 
     onMount(() => {
+        console.log("data.initialServers", data.initialServers)
         initializeServers(data.initialServers)
     })
 </script>

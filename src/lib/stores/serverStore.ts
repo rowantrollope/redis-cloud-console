@@ -5,21 +5,31 @@ import { ServerState } from "$lib/types/types"
 export const servers = writable<ServerWithStats[]>([])
 
 // Initialize servers with data (used on client-side)
-export function initializeServers(initialServers: ServerConfig[]) {
-    const serverWithStats: ServerWithStats[] = initialServers.map((config) => ({
-        config,
-        stats: null,
-        error: null,
-        state: ServerState.UNKNOWN, // Assuming INITIAL is a valid state
-    }))
+export async function initializeServers(initialServers: ServerConfig[]) {
+    try {
+        console.log("initializeServers", initialServers)
+        const serverWithStats: ServerWithStats[] = initialServers.map(
+            (config) => ({
+                config,
+                stats: null,
+                error: null,
+                state: ServerState.UNKNOWN,
+            })
+        )
+        console.log("initializeServers", serverWithStats)
+        servers.set(serverWithStats)
 
-    servers.set(serverWithStats)
-    
-    initialServers.forEach((server) => refreshServerStats(server.id))
+        initialServers.forEach((server: ServerConfig) =>
+            refreshServerStats(server.id)
+        )
+    } catch (error) {
+        console.error("Error initializing servers:", error)
+    }
 }
 
 // Refresh stats for a specific server
 export async function refreshServerStats(serverId: string) {
+    console.log(`refreshServerStats - looking for ${serverId}`)
     servers.update((current) =>
         current.map((server) => {
             if (server.config.id === serverId) {
@@ -35,7 +45,10 @@ export async function refreshServerStats(serverId: string) {
     )
 
     try {
-        const response = await fetch(`/api/redisstats?id=${serverId}`)
+        console.log(`refreshServerStats - looking for ${serverId}`)
+        const response = await fetch(`/api/redisstats?id=${serverId}`, {
+            credentials: "include",
+        })
         if (!response.ok) {
             throw new Error("Failed to fetch stats")
         }
@@ -76,6 +89,7 @@ export async function updateServer(updatedConfig: ServerConfig) {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(updatedConfig),
+            credentials: "include",
         })
         if (!response.ok) {
             throw new Error("Failed to update server")
@@ -103,6 +117,7 @@ export async function removeServer(serverId: string) {
     try {
         const response = await fetch(`/api/servers?id=${serverId}`, {
             method: "DELETE",
+            credentials: "include",
         })
         if (!response.ok) {
             throw new Error("Failed to delete server")
@@ -122,6 +137,7 @@ export async function addServer(newConfig: ServerConfig) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(newConfig),
+            credentials: "include",
         })
         if (!response.ok) {
             throw new Error("Failed to add server")

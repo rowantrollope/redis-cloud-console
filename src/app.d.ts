@@ -8,7 +8,7 @@ declare global {
 		// interface PageState {}
 		// interface Platform {}
 		interface Locals {
-            userId: string
+            userId: string;
         }
 	}
 }
