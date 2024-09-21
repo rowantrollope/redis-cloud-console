@@ -6,6 +6,7 @@ export const load: PageServerLoad = async ({ locals }) => {
     const userID = locals.userId;
     const serverConfigs = await getServerConfigs(userID);
     return {
+        userID,
         initialServers: serverConfigs,
     };
 };

@@ -28,11 +28,12 @@
     import type { ServerConfig } from "$lib/types/types"
 
     export let data: {
+        userID: string
         initialServers: ServerConfig[]
     }
 
     onMount(() => {
-        console.log("data.initialServers", data.initialServers)
+        console.log(`data.initialServers for user: ${data.userID}`, data.initialServers)
         initializeServers(data.initialServers)
     })
 </script>

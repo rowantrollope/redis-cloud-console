@@ -52,6 +52,7 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
                 'password' in config &&
                 typeof config.password === 'string' &&
                 config.password !== null &&
+                config.password !== undefined &&
                 config.password.length > 0
             ) {
                 config.password = decrypt(config.password);

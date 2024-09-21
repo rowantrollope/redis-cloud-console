@@ -11,11 +11,10 @@
         Button,
     } from "flowbite-svelte"
     import {
-        ArrowRightOutline,
+        DotsHorizontalOutline,
         EditOutline,
         TrashBinOutline,
-        ChevronDownOutline,
-        DatabaseOutline,
+        ArrowRightOutline,
     } from "flowbite-svelte-icons"
     import { calculateKeyspaceHitPercentage } from "$lib/redisInfo"
     import { createEventDispatcher } from "svelte"
@@ -110,7 +109,7 @@
                         menuClicked(event)
                     }}
                 >
-                    <ChevronDownOutline />
+                    <DotsHorizontalOutline />
                 </Button>
             {/if}
             {#if SHOW_CONNECT_BUTTON && server.state === ServerState.SUCCESS}

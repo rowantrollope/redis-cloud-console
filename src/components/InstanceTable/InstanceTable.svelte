@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { onMount } from "svelte"
     import { selectedColumns, availableColumns } from "$lib/stores/columnStore"
     import {
         servers,

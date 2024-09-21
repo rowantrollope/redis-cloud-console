@@ -43,9 +43,9 @@ export async function refreshServerStats(serverId: string) {
             return server
         })
     )
-
+    
     try {
-        console.log(`refreshServerStats - looking for ${serverId}`)
+
         const response = await fetch(`/api/redisstats?id=${serverId}`, {
             credentials: "include",
         })
@@ -53,6 +53,7 @@ export async function refreshServerStats(serverId: string) {
             throw new Error("Failed to fetch stats")
         }
         const stats = await response.json()
+
         servers.update((current) =>
             current.map((server) =>
                 server.config.id === serverId
