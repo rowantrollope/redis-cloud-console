@@ -7,26 +7,37 @@ const SERVER_CONFIGS_KEY = "server_configs"
 const SERVER_CONFIG_KEY = "server_config"
 
 // Securely store this key, do NOT hard-code in production
-const ENCRYPTION_KEY =
-    process.env.ENCRYPTION_KEY || "testtesttesttesttesttesttest" // Must be 32 bytes for AES-256
-const IV_LENGTH = 16 // For AES, this is always 16
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+  
+if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
+    throw new Error("ENCRYPTION_KEY environment variable must be set and 32 bytes long");
+}
+const ENABLE_ENCRYPTION = false 
+
+const IV_LENGTH = 16; // For AES, this is always 16
 
 function encrypt(text: string): string {
-    let iv = crypto.randomBytes(IV_LENGTH)
-    let cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv)
-    let encrypted = cipher.update(text)
-    encrypted = Buffer.concat([encrypted, cipher.final()])
-    return iv.toString('hex') + ':' + encrypted.toString('hex')
+    if (!ENABLE_ENCRYPTION) {
+        return text
+    }
+    const iv = crypto.randomBytes(IV_LENGTH);
+    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let encrypted = cipher.update(text);
+    encrypted = Buffer.concat([encrypted, cipher.final()]);
+    return iv.toString('hex') + ':' + encrypted.toString('hex');
 }
 
 function decrypt(text: string): string {
-    let textParts = text.split(':')
-    let iv = Buffer.from(textParts.shift() as string, 'hex')
-    let encryptedText = Buffer.from(textParts.join(':'), 'hex')
-    let decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv)
-    let decrypted = decipher.update(encryptedText)
-    decrypted = Buffer.concat([decrypted, decipher.final()])
-    return decrypted.toString()
+    if (!ENABLE_ENCRYPTION) {
+        return text
+    }
+    const textParts = text.split(':');
+    const iv = Buffer.from(textParts.shift() as string, 'hex');
+    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
+    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
+    let decrypted = decipher.update(encryptedText);
+    decrypted = Buffer.concat([decrypted, decipher.final()]);
+    return decrypted.toString();
 }
 
 /**
@@ -43,14 +54,20 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
     if (data.length === 0) {
         return []
     }
-    let serverConfigs = []
+    let serverConfigs: ServerConfig[] = []
     try {
-        serverConfigs = await redisClient.json.mGet(data, "$")
+        const result = await redisClient.json.mGet(data, "$") as unknown;
+        serverConfigs = result as ServerConfig[];
     } catch (error) {
         console.error("Error getting server configurations from Redis:", error)
         return []
     }
     console.log("serverConfigs found", serverConfigs)
+
+    if (!ENABLE_ENCRYPTION) {
+        return (serverConfigs ?? []).flat() 
+    }
+
     // Decrypt passwords after retrieval
     const decryptedConfigs = serverConfigs.flat().map(config => {
         if (
