@@ -30,5 +30,7 @@
         max-width: 64rem;
         margin: 0 auto;
         box-sizing: border-box;
+        justify-content: center;
+        align-items: center;
     }
 </style>

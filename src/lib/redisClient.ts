@@ -53,8 +53,10 @@ export async function readRedisInfo(
             socket: {
                 host: config.host,
                 port: config.port,
+                tls: config.useTLS,
             },
             password: config.password,
+            username: config.username,
         })
 
         await client.connect()

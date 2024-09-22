@@ -12,7 +12,9 @@
 
 </script>
 
-<form class="grid gap-6 mb-6 {oneColumn ? 'grid-cols-1' : 'md:grid-cols-2'}">
+<form>
+    <div class="grid gap-6 mb-6 {oneColumn ? 'grid-cols-1' : 'md:grid-cols-2'}">
+
     <div>
         <Label for="friendlyName">Database Name</Label>
         <Input
@@ -58,6 +60,17 @@
         />
     </div>
     <div>
+        <Label for="port">Timeout (Seconds)</Label>
+        <Input
+            class="dark:bg-slate-800"
+            type="number"
+            id="timeout"
+            bind:value={server.timeout}
+            required
+            placeholder="Enter Timeout in Seconds (default: 30)"
+        />
+    </div>
+    <div>
         <Label for="password">Password</Label>
         <div class="relative">
             <Input
@@ -80,9 +93,13 @@
             </button>
         </div>
     </div>
-    <Toggle>Enable Automatic Data Compression</Toggle>
+        </div>
+    <div class="flex flex-col gap-2">
+    <!-- <Toggle>Enable Automatic Data Compression</Toggle>
     <Toggle>Use TLS</Toggle>
-    <Toggle>Use SSH Tunnel</Toggle>
+    <Toggle>Use SSH Tunnel</Toggle> -->
+    </div>
+
 
 
 </form>

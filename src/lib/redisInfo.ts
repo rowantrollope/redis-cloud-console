@@ -6,7 +6,10 @@ export function getProvider(server: ServerWithStats): string {
     }
 
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
-    if (server.config.host.includes("redis-cloud")) {
+    if (
+        server.config.host.includes("redis-cloud") ||
+        server.config.host.includes("rlrcp.com")
+    ) {
         return `Redis Cloud`
     } else if (server.config.host.includes("amazonaws")) {
         return `AWS Elasticache`

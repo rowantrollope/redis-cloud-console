@@ -14,6 +14,10 @@ export interface ServerConfig {
     port: number
     username: string
     password?: string
+    timeout?: number
+    useCompression?: boolean
+    useTLS?: boolean
+    useSSH?: boolean
 }
 
 export interface ServerStats {

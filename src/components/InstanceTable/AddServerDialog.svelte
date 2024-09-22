@@ -13,16 +13,17 @@
         port: 6379,
         password: "",
         username: "",
+        timeout: 30,
     }
 
     export let open: boolean
 
     const handleAdd = async () => {
-        await addServer(server);
-        open = false;
+        await addServer(server)
+        open = false
     }
 
-    $: addEnabled = server.name.length > 0 && server.host.length > 0 
+    $: addEnabled = server.name.length > 0 && server.host.length > 0
 
     $: if (open) {
         server = {
@@ -32,18 +33,20 @@
             port: 6379,
             password: "",
             username: "",
+            timeout: 30,
         }
     }
-
 </script>
 
 <Modal title="Add Redis Instance" bind:open autoclose>
-    <EditServerPanel bind:server={server} />
+    <EditServerPanel bind:server />
 
     <svelte:fragment slot="footer">
         <div class="flex w-full space-x-2">
             <div class="grow" />
-            <Button color="primary" disabled={!addEnabled} on:click={handleAdd}>Add Instance</Button>
+            <Button color="primary" disabled={!addEnabled} on:click={handleAdd}
+                >Add Instance</Button
+            >
         </div>
     </svelte:fragment>
 </Modal>
