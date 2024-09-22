@@ -133,6 +133,7 @@ export async function removeServer(serverId: string) {
 
 // Add a new server configuration
 export async function addServer(newConfig: ServerConfig) {
+    console.log("addServer", newConfig)
     try {
         const response = await fetch("/api/servers", {
             method: "POST",

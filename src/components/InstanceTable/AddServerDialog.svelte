@@ -5,13 +5,14 @@
     import type { ServerConfig } from "$lib/types/types"
     import { Button, Modal } from "flowbite-svelte"
     import { addServer } from "$lib/stores/serverStore"
-    import { onMount } from "svelte"
+
     let server: ServerConfig = {
         id: uuidv4(),
         name: "",
         host: "",
         port: 6379,
         password: "",
+        username: "",
     }
 
     export let open: boolean
@@ -23,17 +24,17 @@
 
     $: addEnabled = server.name.length > 0 && server.host.length > 0 
 
-    onMount(() => {
-        console.log("AddServerDialog - onMount")
-        // clear the server object
+    $: if (open) {
         server = {
             id: uuidv4(),
             name: "",
             host: "",
             port: 6379,
             password: "",
+            username: "",
         }
-    })
+    }
+
 </script>
 
 <Modal title="Add Redis Instance" bind:open autoclose>
