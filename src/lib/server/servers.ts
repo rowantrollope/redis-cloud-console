@@ -35,6 +35,7 @@ function decrypt(text: string): string {
  * @returns {Promise<ServerConfig[]>} Array of server configurations.
  */
 export async function getServerConfigs(userID: string): Promise<ServerConfig[]> {
+    console.log("getServerConfigs", userID)
     // Hash the userID to retrieve records
     const userKey = `user:${userID}:${SERVER_CONFIGS_KEY}`
     const data = await redisClient.sMembers(userKey)
@@ -49,7 +50,7 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
         console.error("Error getting server configurations from Redis:", error)
         return []
     }
-
+    console.log("serverConfigs found", serverConfigs)
     // Decrypt passwords after retrieval
     const decryptedConfigs = serverConfigs.flat().map(config => {
         if (
@@ -64,7 +65,7 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
         }
         return config
     })
-
+    console.log("decryptedConfigs", decryptedConfigs)
     return decryptedConfigs || []
 }
 
