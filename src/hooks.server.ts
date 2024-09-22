@@ -7,19 +7,27 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     if (!userId) {
         userId = uuidv4();
+
+        // Determine if the original request was over HTTPS
+        const protocolHeader = event.request.headers.get('x-forwarded-proto');
+        const isSecureConnection = protocolHeader
+            ? protocolHeader.includes('https')
+            : event.url.protocol === 'https:';
+
         event.cookies.set('user_id', userId, {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
-            secure: process.env.NODE_ENV === 'production',
+            secure: isSecureConnection,
         });
     }
-    console.log("userId", userId)
+    console.log("userId", userId);
+
     // Make userId available in locals
     event.locals.userId = userId;
 
     if (!redisClient.isOpen) {
-        await connectRedisClient()
+        await connectRedisClient();
     }
 
     return resolve(event);
