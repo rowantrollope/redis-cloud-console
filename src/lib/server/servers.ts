@@ -7,13 +7,12 @@ const SERVER_CONFIGS_KEY = "server_configs"
 const SERVER_CONFIG_KEY = "server_config"
 
 // Securely store this key, do NOT hard-code in production
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default_encryption_key";
+const ENABLE_ENCRYPTION = true 
   
 if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
     throw new Error("ENCRYPTION_KEY environment variable must be set and 32 bytes long");
 }
-const ENABLE_ENCRYPTION = false 
-
 const IV_LENGTH = 16; // For AES, this is always 16
 
 function encrypt(text: string): string {
