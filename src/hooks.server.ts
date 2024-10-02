@@ -1,30 +1,30 @@
 import type { Handle } from '@sveltejs/kit';
-import { v4 as uuidv4 } from 'uuid';
-import { connectRedisClient, redisClient } from './lib/redisClient';
+import { parse } from 'cookie';
+import { connectRedisClient, redisClient } from '$lib/redisClient';
+import crypto from 'crypto';
 
 export const handle: Handle = async ({ event, resolve }) => {
     let userId = event.cookies.get('user_id');
 
     if (!userId) {
-        userId = uuidv4();
-
-        // Determine if the original request was over HTTPS
-        const protocolHeader = event.request.headers.get('x-forwarded-proto');
-        const isSecureConnection = protocolHeader
-            ? protocolHeader.includes('https')
-            : event.url.protocol === 'https:';
-
+        userId = crypto.randomUUID();
         event.cookies.set('user_id', userId, {
             path: '/',
             httpOnly: true,
             sameSite: 'lax',
-            secure: isSecureConnection,
+            secure: event.url.protocol === 'https:',
         });
     }
-    console.log("userId", userId);
 
     // Make userId available in locals
     event.locals.userId = userId;
+
+    // Retrieve access token from cookies
+    const cookies = parse(event.request.headers.get('cookie') || '');
+    const accessToken = cookies.access_token;
+    if (accessToken) {
+        event.locals.accessToken = accessToken;
+    } 
 
     if (!redisClient.isOpen) {
         await connectRedisClient();

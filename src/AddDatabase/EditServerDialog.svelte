@@ -59,9 +59,9 @@
     {/if}
     <svelte:fragment slot="footer">
         <div class="flex w-full space-x-2">
-            <Button class="" outline={true} on:click={handleRemove}>Remove Instance</Button>
+            <button class="red-outline-button" on:click={handleRemove}>Remove Instance</button>
             <div class="grow" />
-            <Button color="primary" on:click={handleUpdate}>Save</Button>
+            <button class="lime-button" on:click={handleUpdate}>Save</button>
         </div>
     </svelte:fragment>
 </Modal>

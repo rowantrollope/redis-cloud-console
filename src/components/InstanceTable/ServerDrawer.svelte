@@ -4,7 +4,7 @@
     import { ArrowRightOutline, DatabaseOutline } from "flowbite-svelte-icons"
     import { sineInOut } from "svelte/easing"
     import ServerStatsDialog from "./ServerStatsDialog.svelte"
-    import EditServerDialog from "./EditServerDialog.svelte"
+    import EditServerDialog from "../../AddDatabase/EditServerDialog.svelte"
     import { createEventDispatcher } from "svelte"
 
     const dispatch = createEventDispatcher()
@@ -83,17 +83,17 @@
                 {/each}
             {/if}
         </div>
-        <Button color="blue" outline on:click={handleStats}>Show all Stats</Button>
+        <button class="outline-button" on:click={handleStats}>Show all Stats</button>
         <div class="grow" />
-        <Button
-            class="bg-slate-500 text-lime-500"
+        <button
+            class="lime-button"
             on:click={() => dispatch("connect")}
         >
             Connect with Redis Insight
             <ArrowRightOutline class="w-5 h-5 ms-2" />
-        </Button>
-        <Button color="blue" outline on:click={handleEdit}>Edit Connection Details</Button>
-        <Button color="red" outline>Remove</Button>
+    </button>
+        <button class="outline-button" on:click={handleEdit}>Edit Connection Details</button>
+        <button class="red-outline-button" on:click={() => dispatch("remove")}>Remove</button>
     </div>
 </Drawer>
 

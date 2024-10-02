@@ -1,20 +1,17 @@
 <script lang="ts">
-    import { Input, Label, Toggle } from "flowbite-svelte"
+  import PasswordInput from '../components/PasswordInput.svelte';
+
+    import { Input, Label } from "flowbite-svelte"
     import { type ServerConfig } from "$lib/types/types"
-    import {
-        EyeOutline,
-        EyeSlashOutline,
-    } from "flowbite-svelte-icons"
 
     export let server: ServerConfig 
     export let oneColumn = false 
-    let showPassword = false; // Add this line
 
 </script>
 
 <form>
     <div class="grid gap-6 mb-6 {oneColumn ? 'grid-cols-1' : 'md:grid-cols-2'}">
-
+    
     <div>
         <Label for="friendlyName">Database Name</Label>
         <Input
@@ -73,32 +70,15 @@
     <div>
         <Label for="password">Password</Label>
         <div class="relative">
-            <Input
-                class="dark:bg-slate-800 pr-10"
-                type={showPassword ? "text" : "password"}
-                id="password"
-                bind:value={server.password}
-                placeholder="Enter password (optional)"
-            />
-            <button 
-                type="button" 
-                on:click={() => showPassword = !showPassword} 
-                class="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5"
-            >
-                {#if showPassword}
-                    <EyeSlashOutline class="h-5 w-5 text-gray-500" />
-                {:else}
-                    <EyeOutline class="h-5 w-5 text-gray-500" />
-                {/if}
-            </button>
+            <PasswordInput bind:value={server.password} id="password"/>
         </div>
     </div>
         </div>
-    <div class="flex flex-col gap-2">
+    <!-- <div class="flex flex-col gap-2"> -->
     <!-- <Toggle>Enable Automatic Data Compression</Toggle>
     <Toggle>Use TLS</Toggle>
     <Toggle>Use SSH Tunnel</Toggle> -->
-    </div>
+    <!-- </div> -->
 
 
 

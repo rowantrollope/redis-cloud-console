@@ -1,53 +1,37 @@
 <!-- components/ServerCell.svelte -->
 <script lang="ts">
+  import ActionButton from './ActionButton.svelte';
+
     import StatusButton from "./StatusButton.svelte"
-    import { type ServerWithStats, ServerState } from "$lib/types/types"
+    import { type ServerWithStats, ServerState, DatabaseType } from "$lib/types/types"
     import {
         getProvider,
         getRedisVersion,
         openRedisInsight,
     } from "$lib/redisInfo"
-    import {
-        Button,
-    } from "flowbite-svelte"
-    import {
-        DotsHorizontalOutline,
-        EditOutline,
-        TrashBinOutline,
-        ArrowRightOutline,
-    } from "flowbite-svelte-icons"
+
     import { calculateKeyspaceHitPercentage } from "$lib/redisInfo"
     import { createEventDispatcher } from "svelte"
 
     export let server: ServerWithStats
     export let columnKey: string
 
-    const SHOW_EDIT_BUTTON = false
-    const SHOW_TRASH_BUTTON = false
-    const SHOW_CONNECT_BUTTON = false
-    const SHOW_ACTION_DRAWER = true
-
     const dispatch = createEventDispatcher()
 
     function refreshClicked() {
         dispatch("refresh")
     }
-    function connectClicked(event: MouseEvent) {
+    function connectClicked() {
         console.log("connect clicks")
         openRedisInsight(server)
     }
-    function editClicked(event: MouseEvent) {
-        event.stopPropagation()
+    function editClicked() {
         dispatch("edit")
-        // hidden =! hidden
     }
-    function menuClicked(event: MouseEvent) {
-        event.stopPropagation()
+    function menuClicked() {
         dispatch("menu")
-        // hidden =! hidden
     }
-    function removeClicked(event: MouseEvent) {
-        event.stopPropagation()
+    function removeClicked() {
         dispatch("remove")
     }
 </script>
@@ -59,7 +43,11 @@
         </button>
     {:else if columnKey === "host"}
         <span class="font-mono max-w-36 text-xs overflow-ellipsis line-clamp-1">
-            {server.config.host}:{server.config.port}
+            {#if server.config.type === DatabaseType.LOCAL}
+                {server.config.host}:{server.config.port}
+            {:else if server.config.type === DatabaseType.CLOUD}
+                {server.config.host}
+            {/if}
         </span>
     {:else if columnKey === "provider"}
         {getProvider(server)}
@@ -100,55 +88,13 @@
               )
             : "N/A"}
     {:else if columnKey === "actions"}
-        <div class="flex -space-x-1">
-            {#if SHOW_ACTION_DRAWER}
-                <Button
-                    color="none"
-                    on:click={(event) => {
-                        event.stopPropagation()
-                        menuClicked(event)
-                    }}
-                >
-                    <DotsHorizontalOutline />
-                </Button>
-            {/if}
-            {#if SHOW_CONNECT_BUTTON && server.state === ServerState.SUCCESS}
-                <Button
-                    size="xs"
-                    class="bg-slate-400 text-lime-500 px-2 py-1 hover:bg-lime-500 hover:text-black"
-                    on:click={connectClicked}
-                >
-                    Connect
-                    <ArrowRightOutline class="w-5 h-5 pl-1 " />
-                </Button>
-            {/if}
-
-            {#if SHOW_EDIT_BUTTON}
-                <Button
-                    size="xs"
-                    color="none"
-                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1"
-                    on:click={editClicked}
-                >
-                    <div class="flex">
-                        <EditOutline class="w-4 h-4" />
-                        <!-- <div>edit</div> -->
-                    </div>
-                </Button>
-            {/if}
-            {#if SHOW_TRASH_BUTTON}
-                <Button
-                    size="xs"
-                    color="none"
-                    class="text-gray-500 hover:bg-slate-500 hover:text-lime-500 space-x-1"
-                    on:click={removeClicked}
-                >
-                    <div class="flex">
-                        <TrashBinOutline class="w-4 h-4" />
-                        <!-- <div>edit</div> -->
-                    </div>
-                </Button>
-            {/if}
-        </div>
+        <ActionButton 
+            server={server}
+            on:refresh={refreshClicked}
+            on:connect={connectClicked}
+            on:edit={editClicked}
+            on:menu={menuClicked}
+            on:remove={removeClicked}
+        />
     {/if}
 </section>

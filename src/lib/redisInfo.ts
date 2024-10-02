@@ -1,25 +1,31 @@
-import { type ServerWithStats } from "$lib/types/types"
+import { type ServerWithStats, DatabaseType } from "$lib/types/types"
 
 export function getProvider(server: ServerWithStats): string {
     if (!serverOnline(server)) {
-        return "-"
+        return "offline"
     }
-
+    // if (server.config.host.includes("amazonaws")) {
+    //     return `AWS Elasticache`
+    // } else if (server.config.host.includes("azure")) {
+    //     return `Azure Redis`
+    // } else if (server.config.host.includes("memorystore")) {
+    //     return `GCP Memorystore`
+    // } else {
+    if (server.config.type === DatabaseType.REMOTE) {
+        return "Cloud Proxy"
+    } else if (server.config.type === DatabaseType.CLOUD) {
+        return "Redis Cloud"
+    } else if (server.config.type === DatabaseType.LOCAL) {
+        return "Local"
+    }
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
     if (
         server.config.host.includes("redis-cloud") ||
         server.config.host.includes("rlrcp.com")
     ) {
         return `Redis Cloud`
-    } else if (server.config.host.includes("amazonaws")) {
-        return `AWS Elasticache`
-    } else if (server.config.host.includes("azure")) {
-        return `Azure Redis`
-    } else if (server.config.host.includes("memorystore")) {
-        return `GCP Memorystore`
-    } else {
-        return `OSS / CE`
-    }
+    } else return `OSS / CE`
+
 }
 export function serverOnline(server: ServerWithStats): boolean {
     return (!server.error && server.stats) ? true : false
@@ -49,22 +55,16 @@ export function getLatestVersion(servers: ServerWithStats[]): string {
 }
 
 export function openRedisInsight(server: ServerWithStats) {
-    // support if there is no password, use a different URI
-    if (server.config.password == "") {
-        const redisUri = encodeURIComponent(
-            `redis://default:password@${server.config.host}:${server.config.port}`
-        )
-        const url = `redisinsight://databases/connect?redisUrl=${redisUri}`
-        console.log("host: ", server.config.host)
-        console.log("port: ", server.config.port)
-        window.location.href = url
-    } else {
-        const redisUri = encodeURIComponent(
-            `redis://default:${server.config.password}@${server.config.host}:${server.config.port}`
-        )
-        const url = `redisinsight://databases/connect?redisUrl=${redisUri}`
-        window.location.href = url
-    }
+    const credentials = server.config.password
+        ? `default:${server.config.password}`
+        : `default`
+
+    const redisUri = encodeURIComponent(
+        `redis://${credentials}@${server.config.host}:${server.config.port}`
+    )
+
+    const url = `redisinsight://databases/connect?redisUrl=${redisUri}`
+    window.location.href = url
 }
 
 export function calculateTotalMemory(servers: ServerWithStats[]): number {

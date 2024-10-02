@@ -22,103 +22,98 @@
         calculateTotalKeyspaceMisses,
         formatMemory,
     } from "$lib/redisInfo"
-    import { ServerOutline } from "flowbite-svelte-icons"
 
-    import { initializeServers, servers } from "$lib/stores/serverStore"
-    import type { ServerConfig } from "$lib/types/types"
+    import { cloudAccounts, servers } from "$lib/stores/serverStore"
 
     // Import the AddInstance component or the action to open the add instance modal
-    import AddInstance from "../components/AddInstance.svelte"
+    import GetStartedPanel from "../components/GetStartedPanel.svelte"
 
-    export let data: {
-        userID: string
-        initialServers: ServerConfig[]
-    }
+    let loaded = false
 
     onMount(() => {
-        console.log(
-            `data.initialServers for user: ${data.userID}`,
-            data.initialServers
-        )
-        initializeServers(data.initialServers)
+        loaded = true
     })
 </script>
 
-{#if data.initialServers.length > 0}
-    <!-- Dashboard and InstanceTable Section -->
-    <section class="flex flex-col gap-2">
-        <Accordion flush={true}>
-            <AccordionItem
-                open
-                class="p-0"
-                paddingFlush="py-4 mb-2"
-                textFlushOpen="text-slate-500 dark:text-white font-mono"
-                textFlushDefault="font-mono"
-            >
-                <span slot="header">Dashboard</span>
-                <div class="grid grid-cols-3 gap-4">
-                    <StatCard
-                        title="Active Servers"
-                        value={$servers.filter((s) => s.error == undefined)
-                            .length}
-                        icon={FaCheckCircle}
-                        subtitle={`${$servers.filter((s) => s.error == undefined).length} / ${$servers.length} servers connected`}
-                    />
+{#if loaded}
+    {#if $servers.length > 0}
+        <!-- Dashboard and InstanceTable Section -->
+        <section class="flex flex-col gap-2 pb-10">
+            <Accordion flush={true}>
+                <AccordionItem
+                    open
+                    class="p-0"
+                    paddingFlush="py-4 mb-2"
+                    textFlushOpen="text-slate-500 dark:text-white font-mono"
+                    textFlushDefault="font-mono"
+                >
+                    <span slot="header">Dashboard</span>
+                    <div class="grid grid-cols-3 gap-4">
+                        <StatCard
+                            title="Active Servers"
+                            value={$servers.filter((s) => s.error == undefined)
+                                .length}
+                            icon={FaCheckCircle}
+                            subtitle={`${$servers.filter((s) => s.error == undefined).length} / ${$servers.length} servers connected`}
+                        />
 
-                    <StatCard
-                        title="Total Memory"
-                        value={formatMemory(calculateTotalMemory($servers))}
-                        icon={FaMemory}
-                        current={calculateTotalMemory($servers)}
-                        max={calculateTotalAvailableMemory($servers)}
-                    />
+                        <StatCard
+                            title="Total Memory"
+                            value={formatMemory(calculateTotalMemory($servers))}
+                            icon={FaMemory}
+                            current={calculateTotalMemory($servers)}
+                            max={calculateTotalAvailableMemory($servers)}
+                        />
 
-                    <StatCard
-                        title="Total Connected Clients"
-                        value={calculateTotalClients($servers)}
-                        icon={FaUsers}
-                        subtitle="+10% from last month"
-                    />
+                        <StatCard
+                            title="Total Connected Clients"
+                            value={calculateTotalClients($servers)}
+                            icon={FaUsers}
+                            subtitle="+10% from last month"
+                        />
 
-                    <StatCard
-                        title="Memory Fragmentation"
-                        value={calculateAverageMemoryFragmentation($servers)}
-                        icon={FaServer}
-                        subtitle="Average fragmentation ratio"
-                    />
+                        <StatCard
+                            title="Memory Fragmentation"
+                            value={calculateAverageMemoryFragmentation(
+                                $servers
+                            )}
+                            icon={FaServer}
+                            subtitle="Average fragmentation ratio"
+                        />
 
-                    <StatCard
-                        title="Avg. Commands/sec"
-                        value={calculateAvgCommands($servers)}
-                        icon={FaTerminal}
-                        subtitle="-22% from last month"
-                    />
+                        <StatCard
+                            title="Avg. Commands/sec"
+                            value={calculateAvgCommands($servers)}
+                            icon={FaTerminal}
+                            subtitle="-22% from last month"
+                        />
 
-                    <StatCard
-                        title="Keyspace Hit %"
-                        value={calculateKeyspaceHitPercentage(
-                            calculateTotalKeyspaceHits($servers),
-                            calculateTotalKeyspaceMisses($servers)
-                        )}
-                        icon={FaCheckCircle}
-                        subtitle="Overall keyspace hit rate across all servers"
-                    />
-                </div>
-            </AccordionItem>
-        </Accordion>
+                        <StatCard
+                            title="Keyspace Hit %"
+                            value={calculateKeyspaceHitPercentage(
+                                calculateTotalKeyspaceHits($servers),
+                                calculateTotalKeyspaceMisses($servers)
+                            )}
+                            icon={FaCheckCircle}
+                            subtitle="Overall keyspace hit rate across all servers"
+                        />
+                    </div>
+                </AccordionItem>
+            </Accordion>
 
-        <InstanceTable />
-    </section>
-{:else}
-    <!-- Intro Panel Section -->
-    <Card size="md" class="shadow-none dark:bg-slate-700 dark:border-slate-300">
-        <div class="flex flex-col items-center space-y-4">
-            <h3 class="h3 text-2xl text-black font-bold dark:text-white flex">
-                <ServerOutline class="w-8 h-8 mr-2" />
-                Welcome to Redis Cloud Insight
-            </h3>
-            <p class="mb-6">Redis Cloud Insight allows you to easily manage, monitor, and work with your Redis databases. Get started by adding your first instance and experience the power of Redis Cloud Insight.</p>
-            <AddInstance class="w-full" />
+            <InstanceTable />
+        </section>
+    {:else}
+        <!-- Intro Panel Section -->
+        <GetStartedPanel />
+    {/if}
+{:else if !loaded}
+    <div class="flex justify-center items-center h-screen">
+        <div
+            class="spinner-border animate-spin inline-block w-8 h-8 border-4 border-t-blue-500 border-b-blue-500 border-l-blue-500 border-r-transparent rounded-full"
+            role="status"
+        >
+            <span class="visually-hidden">Loading...</span>
         </div>
-    </Card>
+    </div>
 {/if}

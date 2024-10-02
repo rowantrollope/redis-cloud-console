@@ -9,6 +9,8 @@ import type {
 } from "redis"
 import dotenv from "dotenv"
 
+dotenv.config() 
+
 interface ClientMap {
     [key: string]: RedisClientType<RedisDefaultModules, RedisScripts>
 }
@@ -48,24 +50,20 @@ export async function readRedisInfo(
     config: ServerConfig
 ): Promise<ServerStats> {
     try {
-        console.log(`readRedisInfo - connecting to ${config.name}`)
         const client = createClient({
             socket: {
                 host: config.host,
                 port: config.port,
-                tls: config.useTLS,
             },
+            username: config.username || 'default',
             password: config.password,
-            username: config.username,
         })
-
         await client.connect()
 
         const infoRaw = await client.info()
         const stats = parseRedisInfo(infoRaw)
 
         await client.disconnect()
-
         return stats
     } catch (err) {
         console.error(`Error connecting to Redis server ${config.name}:`, err)
@@ -103,7 +101,7 @@ function getEnvVar(key: string): string {
     }
     throw new Error(`Environment variable ${key} is not set`)
 }
-dotenv.config()
+
 export const redisClient = createClient({
     url: `redis://:${getEnvVar("REDIS_PASSWORD")}@${getEnvVar(
         "REDIS_HOST"

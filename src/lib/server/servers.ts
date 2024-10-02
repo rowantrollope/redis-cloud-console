@@ -1,43 +1,10 @@
 // src/lib/server/servers.ts
 import { redisClient } from "$lib/redisClient"
-import type { ServerConfig } from "../types/types"
-import crypto from "crypto"
+import type { ServerConfig } from "$lib/types/types"
+import { encrypt, decrypt } from "$lib/server/encryption"
 
 const SERVER_CONFIGS_KEY = "server_configs"
 const SERVER_CONFIG_KEY = "server_config"
-
-// Securely store this key, do NOT hard-code in production
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "default_encryption_key";
-const ENABLE_ENCRYPTION = true 
-  
-if (!ENCRYPTION_KEY || ENCRYPTION_KEY.length !== 32) {
-    throw new Error("ENCRYPTION_KEY environment variable must be set and 32 bytes long");
-}
-const IV_LENGTH = 16; // For AES, this is always 16
-
-function encrypt(text: string): string {
-    if (!ENABLE_ENCRYPTION) {
-        return text
-    }
-    const iv = crypto.randomBytes(IV_LENGTH);
-    const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let encrypted = cipher.update(text);
-    encrypted = Buffer.concat([encrypted, cipher.final()]);
-    return iv.toString('hex') + ':' + encrypted.toString('hex');
-}
-
-function decrypt(text: string): string {
-    if (!ENABLE_ENCRYPTION) {
-        return text
-    }
-    const textParts = text.split(':');
-    const iv = Buffer.from(textParts.shift() as string, 'hex');
-    const encryptedText = Buffer.from(textParts.join(':'), 'hex');
-    const decipher = crypto.createDecipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY), iv);
-    let decrypted = decipher.update(encryptedText);
-    decrypted = Buffer.concat([decrypted, decipher.final()]);
-    return decrypted.toString();
-}
 
 /**
  * Retrieves all server configurations for a specific user from Redis.
@@ -45,7 +12,6 @@ function decrypt(text: string): string {
  * @returns {Promise<ServerConfig[]>} Array of server configurations.
  */
 export async function getServerConfigs(userID: string): Promise<ServerConfig[]> {
-    console.log("getServerConfigs", userID)
     // Hash the userID to retrieve records
     const userKey = `user:${userID}:${SERVER_CONFIGS_KEY}`
     const data = await redisClient.sMembers(userKey)
@@ -60,11 +26,6 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
     } catch (error) {
         console.error("Error getting server configurations from Redis:", error)
         return []
-    }
-    console.log("serverConfigs found", serverConfigs)
-
-    if (!ENABLE_ENCRYPTION) {
-        return (serverConfigs ?? []).flat() 
     }
 
     // Decrypt passwords after retrieval
@@ -81,7 +42,6 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
         }
         return config
     })
-    console.log("decryptedConfigs", decryptedConfigs)
     return decryptedConfigs || []
 }
 
@@ -150,3 +110,4 @@ export async function updateServerConfig(userID: string, updatedConfig: ServerCo
         throw error
     }
 }
+

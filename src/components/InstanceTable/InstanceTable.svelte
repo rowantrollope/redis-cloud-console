@@ -6,7 +6,7 @@
         updateServer,
         removeServer,
     } from "$lib/stores/serverStore"
-    import { type ServerWithStats } from "$lib/types/types"
+    import { type ServerWithStats, DatabaseType } from "$lib/types/types"
     import {
         Table,
         TableBody,
@@ -26,11 +26,10 @@
     } from "flowbite-svelte-icons"
 
     import ServerCell from "./ServerCell.svelte"
-    import AddServerDialog from "./AddServerDialog.svelte"
+    import RemoteServerCell from "./RemoteServerCell.svelte"
+    import AddDatabase from "../../AddDatabase/AddDatabase.svelte"
     import ServerDrawer from "./ServerDrawer.svelte"
-        import {
-        openRedisInsight,
-    } from "$lib/redisInfo"
+    import { openRedisInsight } from "$lib/redisInfo"
     // Compute the visible columns based on selectedColumns
     $: visibleColumns = availableColumns.filter((column) =>
         $selectedColumns.has(column.key)
@@ -38,28 +37,23 @@
 
     let columnsModalOpen = false
     let addInstanceModalOpen = false
-    let serverDrawerOpen: { [key: string]: boolean } = {}
-
+    let serverDrawerOpen: { [key: string]: boolean } = $servers.reduce((acc: { [key: string]: boolean }, server) => {
+        acc[server.config.id] = true;
+        return acc;
+    }, {});
+    
     function handleConnect(server: ServerWithStats) {
         console.log("handleConnect", server)
         openRedisInsight(server)
-    }
-
-    function handleUpdate(server: ServerWithStats) {
-        updateServer(server.config)
     }
 
     function handleRemove(server: ServerWithStats) {
         removeServer(server.config.id)
     }
 
-    function handleRefresh(server: ServerWithStats) {
-        refreshServerStats(server.config.id)
-    }
-
     function handleMenu(server: ServerWithStats) {
-        console.log("handleMenu", server)
-        serverDrawerOpen[server.config.id] = true
+        console.log("handleMenu", server.config)
+        serverDrawerOpen[server.config.id] = false
     }
 </script>
 
@@ -72,30 +66,26 @@
         <caption
             class="text-lg font-semibold text-left text-gray-900 bg-white dark:text-white dark:bg-transparent"
         >
-            Redis Instances
+            Redis Databases
             <p class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                Manage your Redis Instances
+                Manage your Redis Databases
             </p>
         </caption>
         <div class="grow"></div>
-        <Button
-            size="xs"
-            color="none"
+        <button
             on:click={() => (addInstanceModalOpen = true)}
-            class="text-xs text-primary-500 px-2 py-0 flex items-center dark:hover:bg-lime-500 dark:hover:text-black hover:bg-primary-500 dark:text-lime-500 hover:text-white"
+            class="text-xs py-0 no-outline-button"
         >
             <PlusOutline class="w-4 h-4 me-1" />
-            Add Instance
-        </Button>
-        <Button
-            size="xs"
-            color="none"
-            class="text-xs text-primary-500 px-2 py-0 flex items-center dark:hover:bg-lime-500 dark:hover:text-black  hover:bg-primary-500 dark:text-lime-500 hover:text-white"
+            Add Database
+        </button>
+        <button
+            class="text-xs no-outline-button px-2 py-0"
             on:click={() => (columnsModalOpen = true)}
         >
             <AdjustmentsHorizontalOutline class="w-4 h-4 me-1" />
             Customize
-        </Button>
+        </button>
     </div>
 
     <Table striped hoverable>
@@ -110,28 +100,18 @@
         </TableHead>
         <TableBody>
             {#each $servers as server}
-                <TableBodyRow class="cursor-pointer group ">
+                <TableBodyRow>
                     {#each visibleColumns as column}
-                        <TableBodyCell
-                            tdClass="px-5 py-2 dark:bg-slate-700 dark:group-hover:bg-slate-400 "
-                        >
-                            <ServerCell
-                                {server}
-                                columnKey={column.key}
-                                on:refresh={() => handleRefresh(server)}
-                                on:remove={() => handleRemove(server)}
-                                on:menu={() => handleMenu(server)}
-                                on:update={() => handleUpdate(server)}
-                            />
+                        <TableBodyCell>
+                            <!-- Use different components or logic based on server type -->
+                            {#if server.config.type === DatabaseType.REMOTE}
+                                <RemoteServerCell {server} columnKey={column.key} on:menu={() => handleMenu(server)} />
+                            {:else}
+                                <ServerCell {server} columnKey={column.key} on:menu={() => handleMenu(server)} />
+                            {/if}
                         </TableBodyCell>
                     {/each}
                 </TableBodyRow>
-
-                <ServerDrawer
-                    hidden={!serverDrawerOpen[server.config.id]}
-                    on:connect={() => handleConnect(server)}
-                    {server}
-                />
             {/each}
         </TableBody>
     </Table>
@@ -155,4 +135,12 @@
     </div>
 </Modal>
 
-<AddServerDialog bind:open={addInstanceModalOpen} />
+<AddDatabase bind:open={addInstanceModalOpen} />
+{#each $servers as server}
+    <ServerDrawer 
+        bind:hidden={serverDrawerOpen[server.config.id]} 
+        server={server} 
+        on:connect={() => handleConnect(server)}
+        on:remove={() => handleRemove(server)}
+    />
+{/each}
