@@ -16,11 +16,9 @@
         // Set the userID in the userStore
         userStore.set({ userID: data.userID });
 
-        console.log(`Initializing stores for user: ${data.userID}`)
-
         initializeServerStore(data.initialServers)
-        initializeCloudAccountStore(data.initialCloudAccounts)
 
+        initializeCloudAccountStore(data.initialCloudAccounts)
 
     })
 </script>

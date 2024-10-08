@@ -1,7 +1,7 @@
 import { redisClient } from "$lib/redisClient"
 import { encrypt, decrypt } from "$lib/server/encryption"
 import type { RedisCloudAccount, ServerWithStats } from "$lib/types/types"
-import { DatabaseType, ServerState } from "$lib/types/types"
+import { ServerType, ServerState } from "$lib/types/types"
 
 const CLOUD_ACCOUNTS_KEY = "cloudAccounts"
 
@@ -239,7 +239,7 @@ function mapDatabaseToServerWithStats(
         name: db.name,
         host: host,
         port: Number(port),
-        type: DatabaseType.CLOUD,
+        type: ServerType.CLOUD,
         cloudAccountId: account.id,
         databaseId: db.databaseId,
         password: db.security?.password ?? "",

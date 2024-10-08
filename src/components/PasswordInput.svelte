@@ -2,7 +2,7 @@
     import { Input } from "flowbite-svelte"
     import { EyeOutline, EyeSlashOutline } from "flowbite-svelte-icons"
 
-    export let value: string
+    export let value: string | undefined
     export let id: string
     export let placeholder: string = "Enter password (optional)"
     export let tabIndex: string = "0"

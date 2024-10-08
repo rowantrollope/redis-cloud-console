@@ -2,7 +2,7 @@
     import { Modal } from "flowbite-svelte"
     import { createEventDispatcher } from "svelte"
     import { addServer } from "$lib/stores/serverStore"
-    import { type RemoteServerConfig, DatabaseType } from "$lib/types/types"
+    import { type RemoteServerConfig, ServerType } from "$lib/types/types"
     import { v4 as uuidv4 } from "uuid"
     export let open: boolean
     import ActivationCodeInput from "./ActivationCodeInput.svelte" 
@@ -20,10 +20,11 @@
     }
 
     let server: RemoteServerConfig = {
-        type: DatabaseType.REMOTE,
-        id: uuidv4(),
+        type: ServerType.REMOTE,
+        id: "",
         name: "My new database",
-        databaseUUID: ""
+        username: "",
+        password: ""
     }
 
     let error = ""
@@ -51,13 +52,16 @@
 
         try {
             const data = await activationClaim(code);
+            console.log("activationClaim data: ", data)
             // Create new REMOTE server config
             server = {
-                id: data.uuid,
+                id: data.redis_server_id,
                 name: 'New Remote Database',
-                type: DatabaseType.REMOTE,
+                type: ServerType.REMOTE,
+                username: "",
+                password: ""
             };
-            // Optionally open a dialog to edit server details
+            // Open a dialog to edit server details
             handleAddDatabase(server);
         } catch (err: any) {
             error = err.message || 'An error occurred while processing your request.';

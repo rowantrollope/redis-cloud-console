@@ -2,7 +2,7 @@ import type { RequestHandler } from './$types';
 import { json, error } from '@sveltejs/kit';
 import { readRedisInfo } from '$lib/redisClient';
 import { fetchRemoteServerStats } from '$lib/services/redisCloudServerService';
-import { DatabaseType } from '$lib/types/types';
+import { ServerType } from '$lib/types/types';
 
 export const GET: RequestHandler = async ({ url }) => {
     const id = url.searchParams.get('id');
@@ -17,7 +17,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
     try {
         let stats;
-        if (serverConfig.type === DatabaseType.REMOTE) {
+        if (serverConfig.type === ServerType.REMOTE) {
             // Fetch stats via redis-cloud-server
             stats = await fetchRemoteServerStats(serverConfig.databaseUUID);
         } else {

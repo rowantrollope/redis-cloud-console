@@ -1,7 +1,7 @@
 import type { LayoutServerLoad } from "./$types"
 import { getServerConfigs } from "$lib/server/servers"
 import { getCloudAccounts } from "$lib/server/accounts"
-import { fetchRemoteServers } from "$lib/services/redisCloudServerService"
+
 export const load: LayoutServerLoad = async ({ locals }) => {
     const userID = locals.userId
 
@@ -13,12 +13,15 @@ export const load: LayoutServerLoad = async ({ locals }) => {
     }
 
     try {
-        const initialServers = await getServerConfigs(userID)
-        const initialCloudAccounts = await getCloudAccounts(userID)
-        console.log("initialCloudAccounts: ", initialCloudAccounts)
-        console.log("initialServers: ", initialServers
 
-        )
+        const initialServers = await getServerConfigs(userID)
+
+        console.log("initialServers: ", initialServers)
+        
+        const initialCloudAccounts = await getCloudAccounts(userID)
+
+        console.log("initialCloudAccounts: ", initialCloudAccounts)
+        
         return {
             userID,
             initialServers,

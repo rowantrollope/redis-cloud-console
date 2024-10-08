@@ -7,50 +7,30 @@ export enum ServerState {
     ERROR = "error",
 }
 
-export enum DatabaseType {
+export enum ServerType {
     LOCAL = 'local',
     CLOUD = 'cloud',
     REMOTE = 'remote',
 }
-
-export interface BaseServerConfig {
-    id: string;
-    name: string;
-    type: DatabaseType;
-}
-
-export interface LocalServerConfig extends BaseServerConfig {
-    type: DatabaseType.LOCAL;
-    host: string;
-    port: number;
-    password: string;
-    username: string;
-}
-
-export interface CloudServerConfig extends BaseServerConfig {
-    type: DatabaseType.CLOUD
-    cloudAccountId: string // Reference to the CloudAccount
-    databaseId: number
-    provider: string
-    version: string
-    status: string
-    memoryUsedInMb: string
-    memoryLimitInGb: string
-    host: string
-    port: number
+export interface ServerConfig {
+    id: string
+    name: string
+    type: ServerType
+    host?: string
+    port?: number
     username?: string
     password?: string
 
-    // Include other fields from Redis Cloud API response
+    // Additional fields specific to each server type
+
+    // redis.io only
+    cloudAccountId?: string
+
+    // remote server only
+    databaseId?: string
+
+    // ... other common fields
 }
-
-export interface RemoteServerConfig extends BaseServerConfig {
-    type: DatabaseType.REMOTE
-
-    // Include other fields from Redis Cloud API response
-}
-
-export type ServerConfig = LocalServerConfig | CloudServerConfig | RemoteServerConfig;
 
 export interface CloudAccount {
     id: string;

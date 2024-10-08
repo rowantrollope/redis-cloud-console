@@ -2,12 +2,12 @@
 <script lang="ts">
     import EditServerPanel from "./EditServerPanel.svelte"
     import { v4 as uuidv4 } from "uuid"
-    import { type ServerConfig, DatabaseType } from "$lib/types/types"
+    import { type ServerConfig, ServerType } from "$lib/types/types"
     import { Modal } from "flowbite-svelte"
     import { addServer } from "$lib/stores/serverStore"
 
     let server: ServerConfig = {
-        type: DatabaseType.LOCAL,
+        type: ServerType.LOCAL,
         id: uuidv4(),
         name: "",
         host: "",
@@ -29,7 +29,7 @@
 
     $: if (open) {
         server = {
-            type: DatabaseType.LOCAL,
+            type: ServerType.LOCAL,
             id: uuidv4(),
             name: "",
             host: "",

@@ -2,7 +2,7 @@
     import {
         type ServerWithStats,
         ServerState,
-        DatabaseType,
+        ServerType,
     } from "$lib/types/types"
     import { openRedisInsight } from "$lib/redisInfo"
     import { Button } from "flowbite-svelte"

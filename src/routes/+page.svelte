@@ -23,7 +23,7 @@
         formatMemory,
     } from "$lib/redisInfo"
 
-    import { cloudAccounts, servers } from "$lib/stores/serverStore"
+    import { servers } from "$lib/stores/serverStore"
 
     // Import the AddInstance component or the action to open the add instance modal
     import GetStartedPanel from "../components/GetStartedPanel.svelte"

@@ -30,9 +30,9 @@ export async function fetchRemoteServers(userID: string) {
     return response.json()
 }
 
-export async function fetchRemoteServerStats(databaseUUID: string) {
+export async function fetchRemoteServerStats(databaseId: string) {
     const response = await fetch(
-        `${BASE_URL}/stats?id=${databaseUUID}`
+        `${BASE_URL}/stats?id=${databaseId}`
     )
     console.log("fetchRemoteServerStats response", response)
     if (!response.ok) {
@@ -41,8 +41,9 @@ export async function fetchRemoteServerStats(databaseUUID: string) {
             errorData.error || "Failed to fetch remote server stats."
         )
     }
-
-    return response.json()
+    const data = response.json()
+    console.log("Loaded stats for server: %s", data)
+    return data
 }
 
 export async function sendCommandToRemoteServer(

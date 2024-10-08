@@ -3,7 +3,7 @@
   import ActionButton from './ActionButton.svelte';
 
     import StatusButton from "./StatusButton.svelte"
-    import { type ServerWithStats, ServerState, DatabaseType } from "$lib/types/types"
+    import { type ServerWithStats, ServerState, ServerType } from "$lib/types/types"
     import {
         getProvider,
         getRedisVersion,
@@ -43,9 +43,9 @@
         </button>
     {:else if columnKey === "host"}
         <span class="font-mono max-w-36 text-xs overflow-ellipsis line-clamp-1">
-            {#if server.config.type === DatabaseType.LOCAL}
+            {#if server.config.type === ServerType.LOCAL}
                 {server.config.host}:{server.config.port}
-            {:else if server.config.type === DatabaseType.CLOUD}
+            {:else if server.config.type === ServerType.CLOUD}
                 {server.config.host}
             {/if}
         </span>

@@ -1,4 +1,4 @@
-import { type ServerWithStats, DatabaseType } from "$lib/types/types"
+import { type ServerWithStats, ServerType } from "$lib/types/types"
 
 export function getProvider(server: ServerWithStats): string {
     if (!serverOnline(server)) {
@@ -11,17 +11,17 @@ export function getProvider(server: ServerWithStats): string {
     // } else if (server.config.host.includes("memorystore")) {
     //     return `GCP Memorystore`
     // } else {
-    if (server.config.type === DatabaseType.REMOTE) {
+    if (server.config.type === ServerType.REMOTE) {
         return "Cloud Proxy"
-    } else if (server.config.type === DatabaseType.CLOUD) {
+    } else if (server.config.type === ServerType.CLOUD) {
         return "Redis Cloud"
-    } else if (server.config.type === DatabaseType.LOCAL) {
+    } else if (server.config.type === ServerType.LOCAL) {
         return "Local"
     }
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
     if (
-        server.config.host.includes("redis-cloud") ||
-        server.config.host.includes("rlrcp.com")
+        server.config.host?.includes("redis-cloud") ||
+        server.config.host?.includes("rlrcp.com")
     ) {
         return `Redis Cloud`
     } else return `OSS / CE`
@@ -31,19 +31,17 @@ export function serverOnline(server: ServerWithStats): boolean {
     return (!server.error && server.stats) ? true : false
 }
 export function getRedisVersion(server: ServerWithStats): string {
-    if (!serverOnline(server)) {
-        return "-"
-    }
-    const version = server.stats?.redis_version
+    console.log(server.stats)
+    return server.stats?.redis_version ?? "-"
 
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
-    if (server.config.host.includes("redis-cloud")) {
+    if (server.config.host?.includes("redis-cloud")) {
         return `${version}`
-    } else if (server.config.host.includes("aws")) {
+    } else if (server.config.host?.includes("aws")) {
         return `${version}`
-    } else if (server.config.host.includes("azure")) {
+    } else if (server.config.host?.includes("azure")) {
         return `${version}`
-    } else if (server.config.host.includes("memorystore")) {
+    } else if (server.config.host?.includes("memorystore")) {
         return `${version}`
     } else {
         return `${version}`
@@ -54,14 +52,31 @@ export function getLatestVersion(servers: ServerWithStats[]): string {
     return versions.length ? versions.sort().reverse()[0] : "N/A"
 }
 
-export function openRedisInsight(server: ServerWithStats) {
+export async function openRedisInsight(server: ServerWithStats) {
     const credentials = server.config.password
         ? `default:${server.config.password}`
         : `default`
 
+    let host: string = ""
+    let port: string = ""
+
+    if (server.config.type === ServerType.REMOTE) {
+        // retrieve host and port from /connect method on redis-cloud-server 
+        // method takes querystring: ?redis_server_id= 
+        const response = await fetch(`http://127.0.0.1:8080/connect?redis_server_id=${server.config.id}`)
+        const data = await response.json()
+        host = "127.0.0.1"
+        port = data.port
+    } else {
+        host = server.config.host
+        port = server.config.port.toString()
+    }
+
     const redisUri = encodeURIComponent(
-        `redis://${credentials}@${server.config.host}:${server.config.port}`
+        `redis://${credentials}@${host}:${port}`
     )
+
+    console.log(`redisUri: ${redisUri}`)
 
     const url = `redisinsight://databases/connect?redisUrl=${redisUri}`
     window.location.href = url

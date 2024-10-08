@@ -1,9 +1,7 @@
 import type { RequestHandler } from "./$types"
 import { getCloudAccounts, getCloudDatabases } from "$lib/server/accounts"
 
-import type { CloudServerConfig, ServerWithStats } from "$lib/types/types"
-import { DatabaseType, ServerState } from "$lib/types/types"
-import type { RedisCloudAccount } from "$lib/types/types"
+import type { ServerWithStats } from "$lib/types/types"
 import { json } from "@sveltejs/kit"
 
 export const GET: RequestHandler = async ({ locals }) => {

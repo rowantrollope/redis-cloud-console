@@ -6,7 +6,7 @@
         updateServer,
         removeServer,
     } from "$lib/stores/serverStore"
-    import { type ServerWithStats, DatabaseType } from "$lib/types/types"
+    import { type ServerWithStats, ServerType } from "$lib/types/types"
     import {
         Table,
         TableBody,
@@ -26,7 +26,6 @@
     } from "flowbite-svelte-icons"
 
     import ServerCell from "./ServerCell.svelte"
-    import RemoteServerCell from "./RemoteServerCell.svelte"
     import AddDatabase from "../../AddDatabase/AddDatabase.svelte"
     import ServerDrawer from "./ServerDrawer.svelte"
     import { openRedisInsight } from "$lib/redisInfo"
@@ -104,11 +103,7 @@
                     {#each visibleColumns as column}
                         <TableBodyCell>
                             <!-- Use different components or logic based on server type -->
-                            {#if server.config.type === DatabaseType.REMOTE}
-                                <RemoteServerCell {server} columnKey={column.key} on:menu={() => handleMenu(server)} />
-                            {:else}
-                                <ServerCell {server} columnKey={column.key} on:menu={() => handleMenu(server)} />
-                            {/if}
+                            <ServerCell {server} columnKey={column.key} on:menu={() => handleMenu(server)} />
                         </TableBodyCell>
                     {/each}
                 </TableBodyRow>

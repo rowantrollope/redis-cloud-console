@@ -1,7 +1,7 @@
 import { writable, get } from "svelte/store"
 import type { ServerWithStats, ServerConfig } from "$lib/types/types"
 import { ServerState } from "$lib/types/types"
-import { type RedisCloudAccount, DatabaseType } from "$lib/types/types"
+import { type RedisCloudAccount, ServerType } from "$lib/types/types"
 import { userStore } from "$lib/stores/userStore"
 import {
     fetchRemoteServers,
@@ -59,28 +59,28 @@ export async function fetchCloudAccountDatabases(accountId: string): Promise<Ser
 export async function initializeServerStore(initialServers: ServerConfig[]) {
     try {
         // Initialize servers
-        
-        const cloudServersWithStats = await fetchAllCloudDatabases()
-
-        console.log("cloudServersWithStats", cloudServersWithStats)
-
-        // combine the initial servers with the cloud servers
-        // convert initialServers to ServerWithStats
-        const initialServersWithStats = initialServers.map((server) => ({
+        let serversWithStats = initialServers.map((server) => ({
             config: server,
             stats: null,
             error: null,
             state: ServerState.UNKNOWN,
-        }))
+        })) as ServerWithStats[]
 
-        const serversToInitialize = [...initialServersWithStats, ...cloudServersWithStats]
+        const LOAD_CLOUD_SERVERS = false 
 
-        if (initialServers.length > 0) {
-            await initializeServerStats(serversToInitialize)
+        // Cloud Servers (OLD CODE TODO: UPDATE)
+        if (LOAD_CLOUD_SERVERS) {
+            // TODO: get the cloud servers
+            const cloudServers = await fetchAllCloudDatabases()
+            serversWithStats = [...serversWithStats, ...cloudServers]
+            // combine the initial servers with the cloud servers
         }
 
-        servers.set(serversToInitialize)
+        if (serversWithStats.length > 0) {
+            await initializeServerStats(serversWithStats)
+        }
 
+        servers.set(serversWithStats)
     } catch (error) {
         console.error("Error initializing stores:", error)
     }
@@ -109,7 +109,7 @@ export async function refreshServerStats(server: ServerWithStats) {
 
     server.state = ServerState.CONNECTING
 
-    if (server.config.type === DatabaseType.REMOTE) {
+    if (server.config.type === ServerType.REMOTE) {
         // Fetch stats via redis-cloud-server
         console.log(
             "fetching stats for remote server",
@@ -151,7 +151,7 @@ export async function refreshServerStats(server: ServerWithStats) {
             )
         }
     } else {
-        console.log(`loading stats for ${server.config.id}`)
+        console.log(`loading stats for ${server.config.id} ${server.config.type}`)
         try {
             const response = await fetch(
                 `/api/redisstats?id=${server.config.id}&serverConfig=${encodeURIComponent(
@@ -245,28 +245,28 @@ export async function removeServer(serverId: string) {
 }
 
 // Add a new server configuration
-export async function addServer(newConfig: ServerConfig) {
-    console.log("addServer", newConfig)
+export async function addServer(config: ServerConfig) {
+    console.log("addServer", config)
     try {
         const response = await fetch("/api/servers", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newConfig),
+            body: JSON.stringify(config),
             credentials: "include",
         })
+        const newServer = {
+            config: config,
+            stats: null,
+            error: null,
+            state: ServerState.CONNECTING,
+        }
         if (!response.ok) {
             throw new Error("Failed to add server")
         }
         servers.update((current) => [
-            ...current,
-            {
-                config: newConfig,
-                stats: null,
-                error: null,
-                state: ServerState.CONNECTING,
-            },
+            ...current, newServer
         ])
-        refreshServerStats(newConfig.id)
+        refreshServerStats(newServer)
     } catch (error: any) {
         console.error("Error adding server:", error)
     }
