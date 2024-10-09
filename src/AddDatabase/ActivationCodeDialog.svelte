@@ -2,12 +2,9 @@
     import { Modal } from "flowbite-svelte"
     import { createEventDispatcher } from "svelte"
     import { addServer } from "$lib/stores/serverStore"
-    import { type RemoteServerConfig, ServerType } from "$lib/types/types"
-    import { v4 as uuidv4 } from "uuid"
+    import { type ServerConfig, ServerType } from "$lib/types/types"
     export let open: boolean
     import ActivationCodeInput from "./ActivationCodeInput.svelte" 
-    import { userStore } from "$lib/stores/userStore"; // Import the user store
-    import { get } from "svelte/store";
     import { activationClaim } from '$lib/services/redisCloudServerService';
 
     let openDetailsDialog = false
@@ -19,7 +16,7 @@
         return code
     }
 
-    let server: RemoteServerConfig = {
+    let server: ServerConfig = {
         type: ServerType.REMOTE,
         id: "",
         name: "My new database",
@@ -29,7 +26,7 @@
 
     let error = ""
 
-    function handleAddDatabase(server: RemoteServerConfig) {
+    function handleAddDatabase(server: ServerConfig) {
         console.log("handleAddDatabase", server.id)
 
         openDetailsDialog = true
@@ -80,18 +77,10 @@
         <div>
             <label
                 for="code"
-                class="block font-medium text-gray-700 text-center mb-4"
+                class="block font-medium text-center mb-4"
                 >Please enter the activation code from the redis-server</label
             >
             <ActivationCodeInput on:input={handleCodeInput} />
-            <!-- <input
-                type="text"
-                id="code"
-                class="mt-1 block w-32 shadow-sm sm:text-sm border-gray-300 rounded-md"
-                maxlength="9"
-                bind:value={code}
-                on:keyup={(e) => e.key === "Enter" && submitActivationCode()}
-            /> -->
         </div>
         {#if error}
             <p class="mt-2 text-sm text-red-600">{error}</p>
@@ -113,5 +102,6 @@
 <ActivationDetailsDialog
     bind:open={openDetailsDialog}
     bind:server
+    {code}
     on:save={onSave}
 />

@@ -1,6 +1,8 @@
 // src/routes/api/servers/+server.ts
 import type { RequestHandler } from "./$types"
 import { json, error } from "@sveltejs/kit"
+import { ServerType } from "$lib/types/types"
+import { removeRemoteServer } from "$lib/services/redisCloudServerService"
 
 import {
     getServerConfigs,
@@ -38,12 +40,27 @@ export const DELETE: RequestHandler = async ({ url, locals }) => {
     const userID = locals.userId;
     const id = url.searchParams.get("id");
     console.log("/api/servers - DELETE server config", id);
-    if (id) {
-        await removeServerConfig(userID, id);
-        return new Response("Server configuration deleted", { status: 200 });
-    } else {
+
+    if (!id) {
         throw error(400, "Server ID not provided");
     }
+
+    const server = await getServerConfigs(userID).then((servers) => servers.find((s) => s.id === id))
+
+    if (server && server.type === ServerType.REMOTE) {
+        // TODO: remove the server from the remote server
+        // TODO: update the UI to reflect the removal
+        try {
+            const response = await removeRemoteServer(id)
+            console.log("removeRemoteServer", response)
+        } catch {
+            console.error("Error removing remote server:", error)
+            //throw error(500, "Failed to remove remote server.")
+        }
+    }
+
+    await removeServerConfig(userID, id);
+    return new Response("Server configuration deleted", { status: 200 });
 }
 
 export const PUT: RequestHandler = async ({ request, locals }) => {

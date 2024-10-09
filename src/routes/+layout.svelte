@@ -5,7 +5,7 @@
     import { initializeServerStore, initializeCloudAccountStore } from "$lib/stores/serverStore"
     import type { ServerConfig, RedisCloudAccount } from "$lib/types/types"
     import { userStore } from "$lib/stores/userStore"; // Import the user store
-    
+
     export let data: {
         userID: string
         initialServers: ServerConfig[]

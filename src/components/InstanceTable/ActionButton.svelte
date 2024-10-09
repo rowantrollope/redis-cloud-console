@@ -41,14 +41,14 @@
 
 <div class="flex -space-x-1">
     {#if SHOW_ACTION_DRAWER}
-        <Button
-            color="none"
+        <button
+            class="no-outline-button dark:text-lime-500 dark:hover:text-black"
             on:click={() => {
                 menuClicked()
             }}
         >
             <DotsHorizontalOutline />
-        </Button>
+        </button>
     {/if}
     {#if SHOW_CONNECT_BUTTON && server.state === ServerState.SUCCESS}
         <Button

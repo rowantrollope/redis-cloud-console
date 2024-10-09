@@ -31,7 +31,9 @@ export function serverOnline(server: ServerWithStats): boolean {
     return (!server.error && server.stats) ? true : false
 }
 export function getRedisVersion(server: ServerWithStats): string {
-    console.log(server.stats)
+    if (server.stats?.redis_version == "255.255.255") {
+        return "7.4 (OSS/CE)"
+    }
     return server.stats?.redis_version ?? "-"
 
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
@@ -104,6 +106,15 @@ export function calculateTotalClients(servers: ServerWithStats[]): number {
             total + (parseInt(server.stats?.connected_clients || "0") || 0),
         0
     )
+}
+
+export function calculateAverageCPUUtilization(servers: ServerWithStats[]): number {
+    const total = servers.reduce(
+        (total, server) =>
+            total + (parseInt(server.stats?.used_cpu_sys || "0") || 0),
+        0
+    )
+    return (total / servers.length || 0)
 }
 
 export function calculateAvgCommands(servers: ServerWithStats[]): string {

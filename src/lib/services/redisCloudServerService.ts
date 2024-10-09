@@ -34,18 +34,28 @@ export async function fetchRemoteServerStats(databaseId: string) {
     const response = await fetch(
         `${BASE_URL}/stats?id=${databaseId}`
     )
-    console.log("fetchRemoteServerStats response", response)
     if (!response.ok) {
         const errorData = await response.json()
         throw new Error(
             errorData.error || "Failed to fetch remote server stats."
         )
     }
-    const data = response.json()
-    console.log("Loaded stats for server: %s", data)
+    const data = await response.json()
+    console.log("fetchRemoteServerStats response", data)
     return data
 }
+export async function removeRemoteServer(databaseId: string) {
+    const response = await fetch(`${BASE_URL}/activation/deactivate?redisServerId=${databaseId}`, {
+        method: "DELETE",
+    })
+    console.log("removeRemoteServer")
 
+    if (!response.ok) {
+        throw new Error(response.statusText || "Failed to remove remote server.")
+    }
+
+    return 
+}
 export async function sendCommandToRemoteServer(
     databaseUUID: string,
     command: string

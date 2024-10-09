@@ -38,7 +38,7 @@
 
     {#if server.stats}
         <Accordion>
-            <AccordionItem open>
+            <AccordionItem>
                 <span slot="header">Statistics</span>
                 <div class="px-4 py-5 sm:p-6">
                     <dl class="grid lg:grid-cols-3 grid-cols-2 gap-x-2 gap-y-4 ">

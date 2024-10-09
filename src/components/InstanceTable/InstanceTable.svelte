@@ -2,11 +2,9 @@
     import { selectedColumns, availableColumns } from "$lib/stores/columnStore"
     import {
         servers,
-        refreshServerStats,
-        updateServer,
         removeServer,
     } from "$lib/stores/serverStore"
-    import { type ServerWithStats, ServerType } from "$lib/types/types"
+    import { type ServerWithStats } from "$lib/types/types"
     import {
         Table,
         TableBody,
@@ -15,7 +13,6 @@
         TableHead,
         TableHeadCell,
         Card,
-        Button,
         Modal,
         Toggle,
     } from "flowbite-svelte"
@@ -99,7 +96,7 @@
         </TableHead>
         <TableBody>
             {#each $servers as server}
-                <TableBodyRow>
+                <TableBodyRow class="cursor-pointer">
                     {#each visibleColumns as column}
                         <TableBodyCell>
                             <!-- Use different components or logic based on server type -->

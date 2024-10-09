@@ -28,8 +28,8 @@
         bg-lime-300 
         text-black  
         border-black 
-        hover:bg-slate-500
-        hover:text-white;
+        hover:text-black
+        hover:bg-lime-500;
 }
 .red-button {
     @apply button-base
@@ -53,15 +53,18 @@
         bg-transparent
         text-black
         border-black
-        hover:bg-lime-300
-        hover:text-black;
+        hover:bg-lime-500
+        hover:text-black
+        dark:border-white
+        dark:hover:text-black
+        dark:text-white;
 }
 .no-outline-button {
     @apply button-base
         bg-transparent
         text-black
         border-transparent
-        hover:bg-lime-300
+        hover:bg-lime-500
         hover:text-black
         hover:border-black;
 }

@@ -107,12 +107,6 @@ export async function getCloudDatabases(
     account: RedisCloudAccount,
     isFixed: boolean
 ): Promise<ServerWithStats[]> {
-    console.log(
-        isFixed
-            ? "getFixedSubscriptionDatabases"
-            : "getProSubscriptionDatabases",
-        account
-    )
     const allDatabases: ServerWithStats[] = []
 
     const headers = {

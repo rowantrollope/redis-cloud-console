@@ -11,23 +11,25 @@ export const availableColumns: Column[] = [
     { key: "host", label: "Host" },
     { key: "provider", label: "Provider" },
     { key: "version", label: "Version" },
+    { key: "cpu", label: "CPU %" },
     { key: "memory", label: "Memory" },
     { key: "uptime", label: "Uptime" },
     { key: "clients", label: "Clients" },
     { key: "commands", label: "Commands" },
     { key: "keyspaceHit", label: "Keyspace Hit %" },
     { key: "status", label: "Status" },
+    { key: "lastHeartbeat", label: "Last Heartbeat" },
     { key: "actions", label: "Actions" },
 ]
 
 const defaultSelectedColumns = [
     "name",
-    "host",
     "provider",
     "version",
-    "memory",
-    "uptime",
+    "cpu",
+    "commands",
     "status",
+    "lastHeartbeat",
     "actions"
 ];
 

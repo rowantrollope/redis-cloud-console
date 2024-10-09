@@ -2,10 +2,9 @@ import { writable, get } from "svelte/store"
 import type { ServerWithStats, ServerConfig } from "$lib/types/types"
 import { ServerState } from "$lib/types/types"
 import { type RedisCloudAccount, ServerType } from "$lib/types/types"
-import { userStore } from "$lib/stores/userStore"
 import {
-    fetchRemoteServers,
     fetchRemoteServerStats,
+    removeRemoteServer,
 } from "$lib/services/redisCloudServerService"
 
 export const servers = writable<ServerWithStats[]>([])
@@ -39,7 +38,9 @@ export async function fetchAllCloudDatabases(): Promise<ServerWithStats[]> {
         return []
     }
 }
-export async function fetchCloudAccountDatabases(accountId: string): Promise<ServerWithStats[]> {
+export async function fetchCloudAccountDatabases(
+    accountId: string
+): Promise<ServerWithStats[]> {
     try {
         const response = await fetch(
             `/api/cloud-accounts/${accountId}/databases`
@@ -66,7 +67,7 @@ export async function initializeServerStore(initialServers: ServerConfig[]) {
             state: ServerState.UNKNOWN,
         })) as ServerWithStats[]
 
-        const LOAD_CLOUD_SERVERS = false 
+        const LOAD_CLOUD_SERVERS = true
 
         // Cloud Servers (OLD CODE TODO: UPDATE)
         if (LOAD_CLOUD_SERVERS) {
@@ -85,7 +86,9 @@ export async function initializeServerStore(initialServers: ServerConfig[]) {
         console.error("Error initializing stores:", error)
     }
 }
-export async function initializeCloudAccountStore(initialCloudAccounts: RedisCloudAccount[]) {
+export async function initializeCloudAccountStore(
+    initialCloudAccounts: RedisCloudAccount[]
+) {
     // Set the cloud accounts store
     cloudAccounts.set(initialCloudAccounts)
 }
@@ -93,7 +96,6 @@ export async function initializeCloudAccountStore(initialCloudAccounts: RedisClo
 // Initialize servers with data (used on client-side)
 export async function initializeServerStats(initialServers: ServerWithStats[]) {
     try {
-
         console.log("initializeServerStats", initialServers)
 
         initialServers.forEach((server: ServerWithStats) =>
@@ -106,19 +108,13 @@ export async function initializeServerStats(initialServers: ServerWithStats[]) {
 
 // Refresh stats for a specific server
 export async function refreshServerStats(server: ServerWithStats) {
-
     server.state = ServerState.CONNECTING
 
     if (server.config.type === ServerType.REMOTE) {
         // Fetch stats via redis-cloud-server
-        console.log(
-            "fetching stats for remote server",
-            server.config.id
-        )
+        console.log("fetching stats for remote server", server.config.id)
         try {
-            const stats = await fetchRemoteServerStats(
-                server.config.id
-            )
+            const stats = await fetchRemoteServerStats(server.config.id)
             console.log("stats", stats)
             servers.update((current) =>
                 current.map((s) =>
@@ -151,10 +147,14 @@ export async function refreshServerStats(server: ServerWithStats) {
             )
         }
     } else {
-        console.log(`loading stats for ${server.config.id} ${server.config.type}`)
+        console.log(
+            `loading stats for ${server.config.id} ${server.config.type}`
+        )
         try {
             const response = await fetch(
-                `/api/redisstats?id=${server.config.id}&serverConfig=${encodeURIComponent(
+                `/api/redisstats?id=${
+                    server.config.id
+                }&serverConfig=${encodeURIComponent(
                     JSON.stringify(server.config)
                 )}`,
                 {
@@ -219,7 +219,12 @@ export async function updateServer(updatedConfig: ServerConfig) {
                     : server
             )
         )
-        refreshServerStats(updatedConfig.id)
+        const server = get(servers).find(
+            (server) => server.config.id === updatedConfig.id
+        )
+        if (server) {
+            refreshServerStats(server)
+        }
     } catch (error: any) {
         console.error(`Error updating server ${updatedConfig.id}:`, error)
         // Optionally, set an error state here
@@ -228,6 +233,18 @@ export async function updateServer(updatedConfig: ServerConfig) {
 
 // Remove a server configuration
 export async function removeServer(serverId: string) {
+    // TODO: Check if the server is connected to a remote redis cloud server
+    // TODO: If it is, then remove the server from the remote server
+    // TODO: Otherwise, remove the server from the local server
+    // TODO: Update the UI to reflect the removal
+
+    const server = get(servers).find((server) => server.config.id === serverId)
+
+    if (!server) {
+        console.error(`Server ${serverId} not found`)
+        return
+    }
+
     try {
         const response = await fetch(`/api/servers?id=${serverId}`, {
             method: "DELETE",
@@ -263,9 +280,7 @@ export async function addServer(config: ServerConfig) {
         if (!response.ok) {
             throw new Error("Failed to add server")
         }
-        servers.update((current) => [
-            ...current, newServer
-        ])
+        servers.update((current) => [...current, newServer])
         refreshServerStats(newServer)
     } catch (error: any) {
         console.error("Error adding server:", error)
@@ -288,12 +303,14 @@ export async function addCloudAccount(account: RedisCloudAccount) {
         cloudAccounts.update((accounts) => [...accounts, account])
 
         // Update the server list to include new cloud databases
-        
+
         // TODO: fetch servers from the cloud account
         // TODO: update the server list with the new servers
         // TODO: update the UI to show the new servers
-        servers.set([...get(servers), ...(await fetchCloudAccountDatabases(account.id))])
-
+        servers.set([
+            ...get(servers),
+            ...(await fetchCloudAccountDatabases(account.id)),
+        ])
     } catch (error) {
         console.error("Error adding cloud account:", error)
     }
@@ -312,11 +329,12 @@ export async function removeCloudAccount(accountId: string) {
         cloudAccounts.update((accounts) =>
             accounts.filter((acc) => acc.id !== accountId)
         )
-        // remove the databases from the server list 
+        // remove the databases from the server list
         servers.update((current) =>
-            current.filter((server) => server.config.cloudAccountId !== accountId)
+            current.filter(
+                (server) => server.config.cloudAccountId !== accountId
+            )
         )
-
     } catch (error) {
         console.error("Error removing cloud account:", error)
     }

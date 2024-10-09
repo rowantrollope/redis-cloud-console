@@ -43,13 +43,22 @@
 <div class="bg-white flex space-x-2 pl-4">
     <NavBrand href="/" class="py-0">
         <img src="/redislogo.png" class="me-3 h-6" alt="Redis Logo" />
-        <span class="text-xl dark:text-slate-900 redis-grotesk">
-            Cloud Console
+        <span class="text-xl dark:text-slate-900 redis-grotesk whitespace-nowrap">
+            Cloud Insight
         </span>
     </NavBrand>
     <div class="grow"></div>
     <NavHamburger />
     <NavUl>
+        <NavLi>
+            <Button
+                color="none"
+                class="redis-mono"
+                on:click={() => goto("/")}
+            >
+                Dashboard
+            </Button>
+        </NavLi>
         <NavLi>
             <Button
                 color="none"
@@ -63,7 +72,7 @@
             <Button
                 color="none"
                 class="redis-mono"
-                on:click={() => goto("/cloud-accounts")}
+                on:click={() => goto("/alerts")}
             >
                 Alerting
             </Button>
@@ -75,15 +84,6 @@
                 on:click={() => goto("/cloud-accounts")}
             >
                 Reports
-            </Button>
-        </NavLi>
-        <NavLi>
-            <Button
-                color="none"
-                class="redis-mono"
-                on:click={() => goto("/cloud-accounts")}
-            >
-                Statistics
             </Button>
         </NavLi>
         <NavLi>

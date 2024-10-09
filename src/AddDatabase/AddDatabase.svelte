@@ -40,7 +40,7 @@
         <!-- New ParagraphButton -->
         <ParagraphButton
             title="Add by Activation Code"
-            description="Enter an activation code to add your Redis database."
+            description="Enter an activation code to add your Redis server."
             on:click={openActivationCodeDialog}
         >
             <!-- Icon for activation code -->

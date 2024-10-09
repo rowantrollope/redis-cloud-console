@@ -16,11 +16,7 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
         const initialServers = await getServerConfigs(userID)
 
-        console.log("initialServers: ", initialServers)
-        
         const initialCloudAccounts = await getCloudAccounts(userID)
-
-        console.log("initialCloudAccounts: ", initialCloudAccounts)
         
         return {
             userID,

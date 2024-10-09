@@ -38,7 +38,7 @@
     }
 </script>
 
-<button on:click={refreshClicked}>
+<button on:click={refreshClicked} class="w-12">
     {#if server.state === ServerState.CONNECTING}
         <Badge class="flex items-center bg-white dark:bg-transparent">
             <Spinner size="4" class="text-gray-500 mr-1" color="primary" />

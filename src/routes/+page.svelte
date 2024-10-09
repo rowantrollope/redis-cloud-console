@@ -1,21 +1,21 @@
 <!-- src/routes/+page.svelte -->
 <script lang="ts">
-    import { onMount } from "svelte"
+    import { onMount, onDestroy } from "svelte"
 
-    import FaServer from "svelte-icons/fa/FaServer.svelte"
     import FaMemory from "svelte-icons/fa/FaMemory.svelte"
+    import FaMicrochip from "svelte-icons/fa/FaMicrochip.svelte"
     import FaUsers from "svelte-icons/fa/FaUsers.svelte"
     import FaTerminal from "svelte-icons/fa/FaTerminal.svelte"
     import FaCheckCircle from "svelte-icons/fa/FaCheckCircle.svelte"
     import StatCard from "../components/StatCard.svelte"
     import InstanceTable from "../components/InstanceTable/InstanceTable.svelte"
-    import { Accordion, AccordionItem, Card } from "flowbite-svelte"
+    import { refreshServerStats } from "$lib/stores/serverStore"
 
     import {
         calculateTotalMemory,
         calculateTotalAvailableMemory,
         calculateTotalClients,
-        calculateAverageMemoryFragmentation,
+        calculateAverageCPUUtilization,
         calculateAvgCommands,
         calculateKeyspaceHitPercentage,
         calculateTotalKeyspaceHits,
@@ -32,6 +32,22 @@
 
     onMount(() => {
         loaded = true
+        // Start the interval when the component mounts
+        interval = setInterval(() => {
+            // loop through all servers and refresh stats
+            $servers.forEach((server) => {
+                refreshServerStats(server)
+            })
+        }, refreshInterval)
+    })
+
+    // Set up an interval to refresh data every few seconds
+    const refreshInterval = 5000 // Refresh every 5000 milliseconds (5 seconds)
+    let interval: ReturnType<typeof setInterval>
+
+    onDestroy(() => {
+        // Clear the interval when the component is destroyed to prevent memory leaks
+        clearInterval(interval)
     })
 </script>
 
@@ -39,73 +55,79 @@
     {#if $servers.length > 0}
         <!-- Dashboard and InstanceTable Section -->
         <section class="flex flex-col gap-2 pb-10">
-            <Accordion flush={true}>
-                <AccordionItem
+            <!-- <Accordion flush={true}> -->
+            <!-- <AccordionItem
                     open
                     class="p-0"
                     paddingFlush="py-4 mb-2"
                     textFlushOpen="text-slate-500 dark:text-white font-mono"
                     textFlushDefault="font-mono"
-                >
-                    <span slot="header">Dashboard</span>
-                    <div class="grid grid-cols-3 gap-4">
-                        <StatCard
-                            title="Active Servers"
-                            value={$servers.filter((s) => s.error == undefined)
-                                .length}
-                            icon={FaCheckCircle}
-                            subtitle={`${$servers.filter((s) => s.error == undefined).length} / ${$servers.length} servers connected`}
-                        />
+                > -->
+            <!-- <span slot="header">Dashboard</span> -->
+            <div class="grid grid-cols-3 gap-4 mb-3">
+                <StatCard
+                    title="Active Servers"
+                    value={$servers.filter((s) => s.error == undefined).length}
+                    icon={FaCheckCircle}
+                    subtitle={`${$servers.filter((s) => s.error == undefined).length} / ${$servers.length} servers connected`}
+                />
 
-                        <StatCard
-                            title="Total Memory"
-                            value={formatMemory(calculateTotalMemory($servers))}
-                            icon={FaMemory}
-                            current={calculateTotalMemory($servers)}
-                            max={calculateTotalAvailableMemory($servers)}
-                        />
+                <StatCard
+                    title="Total Memory"
+                    value={formatMemory(calculateTotalMemory($servers))}
+                    icon={FaMemory}
+                    current={calculateTotalMemory($servers)}
+                    max={calculateTotalAvailableMemory($servers)}
+                />
 
-                        <StatCard
-                            title="Total Connected Clients"
-                            value={calculateTotalClients($servers)}
-                            icon={FaUsers}
-                            subtitle="+10% from last month"
-                        />
+                <StatCard
+                    title="Connected Clients"
+                    value={calculateTotalClients($servers)}
+                    icon={FaUsers}
+                    subtitle="Total clients connected to all servers"
+                />
+                <StatCard
+                    title="Average CPU Utilization"
+                    value={calculateAverageCPUUtilization($servers)}
+                    icon={FaMicrochip}
+                    subtitle="Average CPU usage across all servers"
+                    precision={2}
+                    suffix="%"
+                />
+                <!-- <StatCard
+                    title="Memory Fragmentation"
+                    value={calculateAverageMemoryFragmentation($servers)}
+                    icon={FaServer}
+                    subtitle="Average fragmentation ratio"
+                /> -->
 
-                        <StatCard
-                            title="Memory Fragmentation"
-                            value={calculateAverageMemoryFragmentation(
-                                $servers
-                            )}
-                            icon={FaServer}
-                            subtitle="Average fragmentation ratio"
-                        />
+                <StatCard
+                    title="Avg. Commands Total"
+                    value={calculateAvgCommands($servers)}
+                    icon={FaTerminal}
+                    subtitle="Average across all servers"
+                />
 
-                        <StatCard
-                            title="Avg. Commands/sec"
-                            value={calculateAvgCommands($servers)}
-                            icon={FaTerminal}
-                            subtitle="-22% from last month"
-                        />
-
-                        <StatCard
-                            title="Keyspace Hit %"
-                            value={calculateKeyspaceHitPercentage(
-                                calculateTotalKeyspaceHits($servers),
-                                calculateTotalKeyspaceMisses($servers)
-                            )}
-                            icon={FaCheckCircle}
-                            subtitle="Overall keyspace hit rate across all servers"
-                        />
-                    </div>
-                </AccordionItem>
-            </Accordion>
+                <StatCard
+                    title="Keyspace Hit %"
+                    value={calculateKeyspaceHitPercentage(
+                        calculateTotalKeyspaceHits($servers),
+                        calculateTotalKeyspaceMisses($servers)
+                    )}
+                    icon={FaCheckCircle}
+                    subtitle="Overall keyspace hit rate across all servers"
+                />
+            </div>
+            <!-- </AccordionItem> -->
+            <!-- </Accordion> -->
 
             <InstanceTable />
         </section>
     {:else}
         <!-- Intro Panel Section -->
-        <GetStartedPanel />
+        <div class="flex justify-center items-center h-screen -mt-20">
+            <GetStartedPanel />
+        </div>
     {/if}
 {:else if !loaded}
     <div class="flex justify-center items-center h-screen">

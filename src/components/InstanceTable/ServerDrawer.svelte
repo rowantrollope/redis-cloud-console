@@ -8,8 +8,10 @@
     import { createEventDispatcher } from "svelte"
 
     const dispatch = createEventDispatcher()
+    
     export let server: ServerWithStats
-    export let hidden = false
+    export let hidden = true
+
     let editInstanceModalOpen = false
     let serverStatsDialogOpen = false
 
@@ -36,7 +38,7 @@
     id="sidebar5"
     width="w-96"
 >
-    <div class="flex flex-col space-y-2 h-full">
+    <div class="flex flex-col space-y-2 h-full dark:text-white">
         <div class="flex items-center">
             <h5
                 id="drawer-label"
@@ -49,8 +51,9 @@
                 class="mb-4 dark:text-white"
             />
         </div>
-        <h3 class="text-xl font-semibold">Database Details</h3>
+        <h3 class="text-lg ">Database Details</h3>
         <div class="text-sm text-gray-500 bg-gray-50 p-4 rounded-lg flex flex-col space-y-2">
+            {#if server.config.type !== "remote"}
             <div class="flex space-x-2 w-full">
                 <div class="w-1/2 text-right">
                     <strong>Host:</strong>
@@ -64,14 +67,26 @@
                 </div>
                 <div class="font-mono">{server.config.port}</div>
             </div>
+            {:else}
+                <div class="text-sm mb-2">
+                    Connected through Redis Cloud Insight Proxy
+                </div>    
+
+                <div class="flex space-x-2 w-full">
+                    <div class="w-1/2 text-right">
+                        <strong>Server ID:</strong>
+                    </div>
+                    <div class="font-mono">{server.config.id}</div>
+                </div>
+            {/if}
 
             {#if server.stats}
                 {#each [
                     { label: 'Server Version', value: server.stats?.redis_version },
                     { label: 'Connected Clients', value: server.stats?.connected_clients },
                     { label: 'Used Memory', value: server.stats?.used_memory_human },
-                    { label: 'Memory Usage', value: server.stats?.total_system_memory_human },
-                    { label: 'CPU Usage', value: server.stats?.used_cpu_user },
+                    { label: 'System Memory', value: server.stats?.total_system_memory_human },
+                    { label: 'CPU Usage', value: Number(server.stats?.used_cpu_user).toFixed(2) + "%" },
                     { label: 'Role', value: server.stats?.role }
                 ] as stat}
                     <div class="flex space-x-2 w-full">
