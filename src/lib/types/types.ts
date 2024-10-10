@@ -25,11 +25,15 @@ export interface ServerConfig {
 
     // redis.io only
     cloudAccountId?: string
-
-    // remote server only
     databaseId?: string
 
-    // ... other common fields
+    // remote server only
+    account_id?: string
+    agent_id?: string
+    status?: string
+    timestamp?: number
+    activation_state?: string
+
 }
 
 export interface CloudAccount {

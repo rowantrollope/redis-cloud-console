@@ -61,7 +61,7 @@
 </script>
 
 <div class="flex flex-col items-start justify-start w-full p-4">
-    <h1 class="text-2xl font-bold text-left pb-4">Monitoring & Alerting</h1>
+    <h1 class="text-2xl font-bold text-left pb-2">Monitoring & Alerting</h1>
     <p class="text-sm text-left pb-4">
         Configure alerting thresholds and notification channels for your Redis
         instance.

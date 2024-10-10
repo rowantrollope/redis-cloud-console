@@ -30,7 +30,7 @@ export async function fetchRemoteServers(userID: string) {
     return response.json()
 }
 
-export async function fetchRemoteServerStats(databaseId: string) {
+export async function fetchRemoteServer(databaseId: string) {
     const response = await fetch(
         `${BASE_URL}/stats?id=${databaseId}`
     )
@@ -41,7 +41,7 @@ export async function fetchRemoteServerStats(databaseId: string) {
         )
     }
     const data = await response.json()
-    console.log("fetchRemoteServerStats response", data)
+    console.log("fetchRemoteServer response", data)
     return data
 }
 export async function removeRemoteServer(databaseId: string) {

@@ -3,7 +3,7 @@ import type { ServerWithStats, ServerConfig } from "$lib/types/types"
 import { ServerState } from "$lib/types/types"
 import { type RedisCloudAccount, ServerType } from "$lib/types/types"
 import {
-    fetchRemoteServerStats,
+    fetchRemoteServer,
     removeRemoteServer,
 } from "$lib/services/redisCloudServerService"
 
@@ -99,7 +99,7 @@ export async function initializeServerStats(initialServers: ServerWithStats[]) {
         console.log("initializeServerStats", initialServers)
 
         initialServers.forEach((server: ServerWithStats) =>
-            refreshServerStats(server)
+            refreshServer(server)
         )
     } catch (error) {
         console.error("Error initializing servers:", error)
@@ -107,21 +107,29 @@ export async function initializeServerStats(initialServers: ServerWithStats[]) {
 }
 
 // Refresh stats for a specific server
-export async function refreshServerStats(server: ServerWithStats) {
+export async function refreshServer(server: ServerWithStats) {
     server.state = ServerState.CONNECTING
 
     if (server.config.type === ServerType.REMOTE) {
         // Fetch stats via redis-cloud-server
-        console.log("fetching stats for remote server", server.config.id)
+        console.log("fetching info for remote server", server.config.id)
         try {
-            const stats = await fetchRemoteServerStats(server.config.id)
-            console.log("stats", stats)
+            const data = await fetchRemoteServer(server.config.id)
+            console.log("stats", data.stats)
+
+            server.config.status = data.serverInfo.status
+            server.config.timestamp = data.serverInfo.timestamp
+            server.config.activation_state = data.serverInfo.activation_state
+            server.config.account_id = data.serverInfo.account_id
+            server.config.agent_id = data.serverInfo.agent_id
+                
             servers.update((current) =>
                 current.map((s) =>
                     s.config.id === server.config.id
                         ? {
                               ...s,
-                              stats,
+                              config: server.config,
+                              stats: data.stats,
                               state: ServerState.SUCCESS,
                               error: null,
                           }
@@ -223,7 +231,7 @@ export async function updateServer(updatedConfig: ServerConfig) {
             (server) => server.config.id === updatedConfig.id
         )
         if (server) {
-            refreshServerStats(server)
+            refreshServer(server)
         }
     } catch (error: any) {
         console.error(`Error updating server ${updatedConfig.id}:`, error)
@@ -281,7 +289,7 @@ export async function addServer(config: ServerConfig) {
             throw new Error("Failed to add server")
         }
         servers.update((current) => [...current, newServer])
-        refreshServerStats(newServer)
+        refreshServer(newServer)
     } catch (error: any) {
         console.error("Error adding server:", error)
     }

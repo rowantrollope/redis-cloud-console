@@ -21,7 +21,6 @@ export const GET: RequestHandler = async ({ locals }) => {
             const fixedDatabases = await getCloudDatabases(account, true)
             allDatabases.push(...proDatabases, ...fixedDatabases)
         }
-        console.log(`GET \api\cloud-databases - allDatabases.length: ${allDatabases.length}`)
         return json(allDatabases)
         //return new Response(JSON.stringify(allDatabases), { status: 200 })
     } catch (error) {

@@ -9,7 +9,7 @@
     import FaCheckCircle from "svelte-icons/fa/FaCheckCircle.svelte"
     import StatCard from "../components/StatCard.svelte"
     import InstanceTable from "../components/InstanceTable/InstanceTable.svelte"
-    import { refreshServerStats } from "$lib/stores/serverStore"
+    import { refreshServer} from "$lib/stores/serverStore"
 
     import {
         calculateTotalMemory,
@@ -36,7 +36,7 @@
         interval = setInterval(() => {
             // loop through all servers and refresh stats
             $servers.forEach((server) => {
-                refreshServerStats(server)
+                refreshServer(server)
             })
         }, refreshInterval)
     })

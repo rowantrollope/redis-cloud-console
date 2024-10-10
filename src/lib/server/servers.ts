@@ -15,8 +15,6 @@ export async function getServerConfigs(userID: string): Promise<ServerConfig[]> 
     // Hash the userID to retrieve records
     const userKey = `user:${userID}:${SERVER_CONFIGS_KEY}`
     
-    console.log(`getServerConfigs ${ userKey }`)
-    
     const data = await redisClient.sMembers(userKey)
 
     if (data.length === 0) {

@@ -3,24 +3,26 @@
     import "../app.css"  
     import { onMount } from "svelte"
     import { initializeServerStore, initializeCloudAccountStore } from "$lib/stores/serverStore"
-    import type { ServerConfig, RedisCloudAccount } from "$lib/types/types"
     import { userStore } from "$lib/stores/userStore"; // Import the user store
+    import type { PageData } from "./$types.js"
 
-    export let data: {
-        userID: string
-        initialServers: ServerConfig[]
-        initialCloudAccounts: RedisCloudAccount[]
-    }
+    export let data: PageData
 
     onMount(async () => {
         // Set the userID in the userStore
-        userStore.set({ userID: data.userID });
+        userStore.set({ userID: data.userID || "" });
 
-        initializeServerStore(data.initialServers)
+        initializeServerStore(data.initialServers || [])
 
-        initializeCloudAccountStore(data.initialCloudAccounts)
+        initializeCloudAccountStore(data.initialCloudAccounts || [])
 
     })
+
+        // Watch for changes in data.userID
+    $: if (data.userID) {
+        userStore.set({ userID: data.userID });
+    }
+
 </script>
 
 <div class="bg-gray-50 dark:bg-slate-800 min-h-screen">

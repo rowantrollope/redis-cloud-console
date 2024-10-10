@@ -81,9 +81,9 @@
             <Button
                 color="none"
                 class="redis-mono"
-                on:click={() => goto("/cloud-accounts")}
+                on:click={() => goto("/settings")}
             >
-                Reports
+                Settings
             </Button>
         </NavLi>
         <NavLi>

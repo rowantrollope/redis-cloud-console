@@ -1,6 +1,6 @@
 import { redisClient } from "$lib/redisClient"
 import { encrypt, decrypt } from "$lib/server/encryption"
-import type { RedisCloudAccount, ServerWithStats } from "$lib/types/types"
+import type { RedisCloudAccount, ServerWithStats, ServerConfig } from "$lib/types/types"
 import { ServerType, ServerState } from "$lib/types/types"
 
 const CLOUD_ACCOUNTS_KEY = "cloudAccounts"
@@ -136,7 +136,7 @@ export async function getCloudDatabases(
         console.log("No subscriptions found for account", account.name)
         return allDatabases
     } else { 
-        console.log("GET \api\cloud-databases - read subscription count: ", subscriptionsData.subscriptions.length)
+        console.log("GET /api/cloud-databases - read subscription count: ", subscriptionsData.subscriptions.length)
     }
 
     // Iterate over subscriptions
@@ -173,7 +173,7 @@ export async function getCloudDatabases(
                 db.databaseId,
                 isFixed
             )
-            console.log(`GET \api\cloud-databases\ ${isFixed ? "fixed" : "pro"} - DATABASE NAME: ${db.name}`)
+            console.log(`GET /api/cloud-databases ${isFixed ? "fixed" : "pro"} - DATABASE NAME: ${db.name}`)
 
             if (dbDetails) {
                 
@@ -228,7 +228,7 @@ function mapDatabaseToServerWithStats(
     // remove port from publicEndpoint 
     const [host, port] = db.publicEndpoint.split(":")
 
-    const serverConfig: CloudServerConfig = {
+    const serverConfig: ServerConfig = {
         id: db.databaseId.toString(),
         name: db.name,
         host: host,

@@ -92,13 +92,16 @@
 
 <section class="text-sm font-normal">
     {#if columnKey === "name"}
-        <button class="flex hover:underline font-semibold" on:click={connectClicked}>
+        <button
+            class="flex hover:underline font-semibold"
+            on:click={connectClicked}
+        >
             {server.config.name}
         </button>
     {:else if columnKey === "lastHeartbeat"}
         {#if server.stats?.timestamp}
             <span class="font-normal">
-            {formatDate(server.stats?.timestamp)}
+                {formatDate(server.stats?.timestamp)}
             </span>
             {formatTime(server.stats?.timestamp)}
         {/if}
@@ -111,10 +114,27 @@
             {/if}
         </span>
     {:else if columnKey === "cpu"}
-        <div class="flex space-x-2">
-            <AnimatedNumber textStyle="font-semibold" value={server.stats?.used_cpu_sys} precision={2} />
-            <span>%</span>
-        </div>
+        {#if server.config.type === ServerType.REMOTE && server.config.status === "RUNNING"}
+            <div class="flex space-x-2">
+                <AnimatedNumber
+                    textStyle="font-semibold"
+                    value={server.stats?.used_cpu_sys}
+                    precision={2}
+                />
+                <span>%</span>
+            </div>
+        {:else if server.config.type === ServerType.REMOTE && server.config.status !== "RUNNING"}
+            <div class="flex space-x-2">-</div>
+        {:else}
+            <div class="flex space-x-2">
+                <AnimatedNumber
+                    textStyle="font-semibold"
+                    value={server.stats?.used_cpu_sys}
+                    precision={2}
+                />
+                <span>%</span>
+            </div>
+        {/if}
     {:else if columnKey === "provider"}
         {getProvider(server)}
     {:else if columnKey === "version"}
@@ -129,7 +149,17 @@
             -
         {/if}
     {:else if columnKey === "clients"}
-        {#if server.state === ServerState.SUCCESS}
+        {#if server.config.type === ServerType.REMOTE}
+            {#if server.config.status === "RUNNING"}
+                {server.stats?.connected_clients || "-"}
+                /
+                <span class="text-gray-400">
+                    {server.stats?.maxclients}
+                </span>
+            {:else}
+                -
+            {/if}
+        {:else if server.state === ServerState.SUCCESS}
             {server.stats?.connected_clients || "-"}
             /
             <span class="text-gray-400">
@@ -138,8 +168,18 @@
         {:else}
             -
         {/if}
+
     {:else if columnKey === "commands"}
-        {#if server.stats?.total_commands_processed}
+        {#if server.config.type === ServerType.REMOTE && server.config.status === "RUNNING"}
+            <div class="flex space-x-2">
+                <AnimatedNumber
+                    textStyle="font-semibold"
+                    value={server.stats?.total_commands_processed}
+                />
+            </div>
+        {:else if server.config.type === ServerType.REMOTE && server.config.status !== "RUNNING"}
+            -
+        {:else if server.stats?.total_commands_processed}
             <AnimatedNumber
                 textStyle="font-semibold"
                 value={server.stats?.total_commands_processed}
@@ -148,7 +188,11 @@
             -
         {/if}
     {:else if columnKey === "uptime"}
-        {#if server.stats?.uptime_in_days}
+        {#if server.config.type === ServerType.REMOTE && server.config.status === "RUNNING"}
+            {server.stats?.uptime_in_days} days
+        {:else if server.config.type === ServerType.REMOTE && server.config.status !== "RUNNING"}
+            -
+        {:else if server.stats?.uptime_in_days}
             {server.stats?.uptime_in_days} days
         {:else}
             -

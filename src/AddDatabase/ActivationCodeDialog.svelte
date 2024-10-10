@@ -55,6 +55,11 @@
                 id: data.redis_server_id,
                 name: 'New Remote Database',
                 type: ServerType.REMOTE,
+                account_id: data.account_id,
+                agent_id: data.agent_id,
+                status: data.status,
+                timestamp: data.timestamp,
+                activation_state: data.activation_state,
                 username: "",
                 password: ""
             };
