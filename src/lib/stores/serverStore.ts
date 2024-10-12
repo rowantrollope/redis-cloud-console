@@ -148,7 +148,6 @@ export async function refreshServer(server: ServerWithStats) {
                               ...s,
                               state: ServerState.ERROR,
                               error: error.message,
-                              stats: null,
                           }
                         : s
                 )

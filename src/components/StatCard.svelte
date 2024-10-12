@@ -19,7 +19,7 @@
             : 0
 </script>
 
-<Card class="shadow-none dark:bg-slate-700 dark:border-slate-300">
+<Card class="card">
     <div class="flex items-center">
         <h3 class="h3 dark:text-white">{title}</h3>
         <div class="grow"></div>

@@ -56,7 +56,7 @@
 <Card
     size="xl"
     padding="sm"
-    class="shadow-none dark:bg-slate-600 dark:border-slate-200 dark:text-lime-500"
+    class="card"
 >
     <div class="flex mb-2 p-2">
         <caption

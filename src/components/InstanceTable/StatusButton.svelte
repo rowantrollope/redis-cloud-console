@@ -41,11 +41,17 @@
 
 <button on:click={refreshClicked} class="w-16">
     {#if server.config.type === ServerType.REMOTE}
-        {#if server.config.status === "RUNNING"}
+        {#if server.config.status === "RUNNING" && server.state === ServerState.SUCCESS}
             <Badge class="rounded py-0.5 bg-transparent text-black dark:bg-transparent dark:text-white">
                 <span class="rounded-full mr-1 w-3 h-3 bg-green-500 dark:bg-lime-500"></span>
                 Running
             </Badge>
+        {:else if server.state === ServerState.ERROR}
+            <Badge class="rounded px-2 py-0.5">
+                <span class="rounded-full mr-1 w-3 h-3 bg-red-500"></span>
+                Can't connect
+            </Badge>
+
         {:else if server.config.status === "OFFLINE"}
             <Badge class="rounded px-2 py-0.5">
                 <span class="rounded-full mr-1 w-3 h-3 bg-red-500"></span>

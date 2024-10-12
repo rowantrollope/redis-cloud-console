@@ -10,11 +10,21 @@
     --font-mono: 'Space Mono', monospace;
     --color-theme-1: #ff3e00;
     --color-theme-2: #4075a6;
-    --color-text: rgba(0, 0, 0, 0.7);
     --column-width: 42rem;
     --column-margin-top: 4rem;
     font-family: var(--font-body);
     color: var(--color-text);
+}
+
+@font-face {
+    font-family: 'TT Trailers';
+    src: url('./fonts/TT Trailers Trial Bold.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.trailers-text {
+    font-family: "TT Trailers", sans-serif;
 }
 
 .redis-mono {
@@ -29,6 +39,15 @@
         text-black  
         border-black 
         hover:text-black
+        hover:bg-lime-500;
+}
+.lime-outline-button {
+    @apply button-base
+        bg-transparent
+        text-lime-500
+        border-lime-500
+        border
+         hover:text-black
         hover:bg-lime-500;
 }
 .red-button {
@@ -79,6 +98,15 @@
         hover:bg-slate-500
         hover:text-white;
 }
+.card {
+    @apply 
+        bg-white 
+        rounded-none 
+        shadow-none 
+        dark:bg-slate-700 
+        dark:border-slate-300 
+        dark:text-lime-500;
+}
 body {
     font-family: "Space Grotesk", sans-serif;
     min-height: 100vh;
@@ -86,8 +114,14 @@ body {
     background-color: white;
 }
 
-h1,
-h2,
+h1 { 
+    @apply text-left font-mono font-bold text-black redis-grotesk dark:text-white;
+}
+
+h2 {
+    @apply text-black font-mono font-semibold redis-grotesk dark:text-white;
+}
+
 p {
     font-weight: 400;
 }
@@ -138,6 +172,9 @@ button:focus:not(:focus-visible) {
 @media (min-width: 720px) {
     h1 {
         font-size: 2.4rem;
+    }
+    h2 {
+        font-size: 1.2rem;
     }
 }
 

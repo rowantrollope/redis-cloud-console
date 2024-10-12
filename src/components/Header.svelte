@@ -23,6 +23,7 @@
     function handleLogin() {
         goto("/auth/login")
     }
+    $: activeUrl = $page.url.pathname
 
     function handleLogout() {
         // Clear cookies or make a request to logout endpoint
@@ -32,65 +33,22 @@
     }
 </script>
 
-<!-- <Navbar fluid={true}>
-    <NavContainer class="bg-green-500 w-full">
-        <div class="bg-green-500 w-full">
-            Hello
-        </div>
-    </NavContainer>
-</Navbar> -->
-
-<div class="bg-white flex space-x-2 pl-4">
-    <NavBrand href="/" class="py-0">
+<Navbar fluid={true} class="bg-white flex space-x-2 border-b border-gray-300 dark:bg-white">
+    <NavBrand href="/">
         <img src="/redislogo.png" class="me-3 h-6" alt="Redis Logo" />
-        <span class="text-xl dark:text-slate-900 redis-grotesk whitespace-nowrap">
-            Cloud Insight
+        <span class="text-lg font-normal mt-2 -ml-1 dark:text-slate-900 whitespace-nowrap">
+            Cloud Insight >
         </span>
     </NavBrand>
-    <div class="grow"></div>
     <NavHamburger />
-    <NavUl>
-        <NavLi>
-            <Button
-                color="none"
-                class="redis-mono"
-                on:click={() => goto("/")}
-            >
-                Dashboard
-            </Button>
-        </NavLi>
-        <NavLi>
-            <Button
-                color="none"
-                class="redis-mono"
-                on:click={() => goto("/cloud-accounts")}
-            >
-                Cloud Accounts
-            </Button>
-        </NavLi>
-        <NavLi>
-            <Button
-                color="none"
-                class="redis-mono"
-                on:click={() => goto("/alerts")}
-            >
-                Alerting
-            </Button>
-        </NavLi>
-        <NavLi>
-            <Button
-                color="none"
-                class="redis-mono"
-                on:click={() => goto("/settings")}
-            >
-                Settings
-            </Button>
-        </NavLi>
-        <NavLi>
-            <DarkMode />
-        </NavLi>
+    <NavUl {activeUrl} class="">
+        <NavLi href="/console" nonActiveClass="redis-mono hover:text-red-500 text-black" activeClass="redis-mono text-red-500">Console</NavLi>
+        <NavLi href="/download" nonActiveClass="redis-mono hover:text-red-500 text-black" activeClass="redis-mono text-red-500">Download</NavLi>
+        <NavLi href="/alerts" nonActiveClass="redis-mono hover:text-red-500 text-black" activeClass="redis-mono text-red-500">Alerting</NavLi>
+        <NavLi href="/settings" nonActiveClass="redis-mono hover:text-red-500 text-black" activeClass="redis-mono text-red-500">Settings</NavLi>
+        <!-- <DarkMode /> -->
     </NavUl>
-</div>
+</Navbar>
 
 <!-- <Navbar let:NavContainer class="py-0" fluid={true}>
     <NavContainer class="bg-white py-0 my-0 px-0">

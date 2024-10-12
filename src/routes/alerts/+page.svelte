@@ -61,7 +61,7 @@
 </script>
 
 <div class="flex flex-col items-start justify-start w-full p-4">
-    <h1 class="text-2xl font-bold text-left pb-2">Monitoring & Alerting</h1>
+    <h1>Monitoring & Alerting</h1>
     <p class="text-sm text-left pb-4">
         Configure alerting thresholds and notification channels for your Redis
         instance.
@@ -70,7 +70,8 @@
 <div
     class=" p-4 w-full mx-auto flex flex-col items-center justify-center space-y-4"
 >
-    <Card size="md" class="space-y-4">
+    <Card size="lg" class="card flex flex-col space-y-4">
+        <h2>How to receive alerts</h2>
         <!-- Email Alert -->
         <div class="flex items-center space-x-4">
             <Toggle bind:checked={emailEnabled} id="email" />
@@ -120,7 +121,8 @@
             {/if}
         </div>
     </Card>
-    <Card size="md" class="space-y-4 flex items-center">
+    <Card size="lg" class="space-y-4 flex card w-full">
+        <h2>Alert Thresholds</h2>
         {#each alerts as alert}
             <div class="flex items-center space-x-2">
                 <Toggle bind:checked={alert.enabled} id={alert.id} />
