@@ -28,6 +28,7 @@
 
     let loaded = false
     let quickStartModalOpen = false 
+   let timeoutId: ReturnType<typeof setTimeout> | null = null
 
     onMount(() => {
         loaded = true
@@ -39,9 +40,13 @@
             })
         }, refreshInterval)
 
-        if ($servers.length === 0) { 
-            quickStartModalOpen = true
-        }
+       // Set a timeout to check servers after a delay
+        timeoutId = setTimeout(() => {
+            if ($servers.length === 0) { 
+                quickStartModalOpen = true
+            }
+        }, 2000) // 1000 milliseconds (1 second)
+
     })
 
     // Set up an interval to refresh data every few seconds
@@ -49,8 +54,13 @@
     let interval: ReturnType<typeof setInterval>
 
     onDestroy(() => {
-        // Clear the interval when the component is destroyed to prevent memory leaks
+        // Clear the interval to prevent memory leaks
         clearInterval(interval)
+
+        // Clear the timeout if it's still pending
+        if (timeoutId) {
+            clearTimeout(timeoutId)
+        }
     })
 </script>
 

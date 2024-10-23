@@ -7,6 +7,9 @@
     import ParagraphButton from "../components/ParagraphButton.svelte"
     import { ServerOutline, QrCodeOutline } from "flowbite-svelte-icons"
     import RedisIcon from "../components/RedisIcon.svelte"
+    import { createEventDispatcher } from "svelte"
+
+    const dispatch = createEventDispatcher()
 
     export let open: boolean
 
@@ -29,6 +32,10 @@
         open = false
     }
 
+    function handleClose() {
+        open = false
+        dispatch('close')
+    }
 
 </script>
 
@@ -87,5 +94,6 @@
 {#if showActivationCodeDialog}
     <ActivationCodeDialog
         bind:open={showActivationCodeDialog}
+        on:close={handleClose}
     />
 {/if}

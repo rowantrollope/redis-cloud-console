@@ -6,7 +6,8 @@
     import ServerStatsDialog from "./ServerStatsDialog.svelte"
     import EditServerDialog from "../../AddDatabase/EditServerDialog.svelte"
     import { createEventDispatcher } from "svelte"
-
+    import { APP_NAME } from "$lib/constants"
+    
     const dispatch = createEventDispatcher()
     
     export let server: ServerWithStats
@@ -69,7 +70,7 @@
             </div>
             {:else}
                 <div class="text-sm mb-2">
-                    Connected through Redis Cloud Insight Proxy
+                    Connected through {APP_NAME} Proxy
                 </div>    
 
                 <div class="flex space-x-2 w-full">
@@ -77,6 +78,13 @@
                         <strong>Server ID:</strong>
                     </div>
                     <div class="font-mono">{server.config.id}</div>
+                </div>
+
+                <div class="flex space-x-2 w-full">
+                    <div class="w-1/2 text-right">
+                        <strong>Hostname:</strong>
+                    </div>
+                    <div class="font-mono">{server.stats?.hostname}</div>
                 </div>
             {/if}
 

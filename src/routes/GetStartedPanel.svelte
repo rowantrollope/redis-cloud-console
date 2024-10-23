@@ -1,9 +1,10 @@
 <!-- src/components/AddInstance.svelte -->
 <script lang="ts">
-	import { activationClaim } from '$lib/services/redisCloudServerService';
     import { createEventDispatcher } from "svelte"
     import { Card } from "flowbite-svelte"
     import AddDatabase from "../AddDatabase/AddDatabase.svelte"
+    import { goto } from "$app/navigation"
+    import { APP_NAME } from "$lib/constants"
 
     const dispatch = createEventDispatcher()
     let addDatabaseModalOpen = false
@@ -17,10 +18,10 @@
 <section class="flex flex-col space-y-4">
     <div class="-m-4 px-8 py-14 bg-slate-800 text-white">
         <div class="text-white text-8xl sm:text-9xl trailers-text uppercase text-center">
-            Manage Open Source Redis<br/>with <span class="text-lime-400">Redis Cloud Insight</span>
+            Manage Open Source Redis<br/>with <span class="text-lime-400">{APP_NAME} </span>
         </div>
         <p class="text-center text-2xl">
-            Redis Cloud Insight lets you monitor and manage
+            {APP_NAME} lets you monitor and manage
             your Redis databases, whether they are on Redis Cloud, Redis OSS or
             Redis Enterprise.
         </p>
@@ -96,7 +97,7 @@
             >
                 <h1 class="card-title group-hover:text-white">Step 3</h1>
                 <h2 class="card-subtitle group-hover:text-white">
-                    Manage from the Redis Cloud Insight Console
+                    Manage from the Console
                 </h2>
                 <p class="grow">
                     Manage your Redis databases seamlessly from the cloud.
@@ -107,7 +108,7 @@
     </div>
 </section>
 
-<AddDatabase bind:open={addDatabaseModalOpen} />
+<AddDatabase bind:open={addDatabaseModalOpen} on:close={() => goto("/console")}/>
 
 <style>
     .card-start {

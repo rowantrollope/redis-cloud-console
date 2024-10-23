@@ -2,15 +2,16 @@
 <script lang="ts">
     import EditServerPanel from "./EditServerPanel.svelte"
     import type { ServerConfig, ServerWithStats } from "$lib/types/types"
-    import { Button, Modal, Accordion, AccordionItem } from "flowbite-svelte"
+    import { Modal} from "flowbite-svelte"
     import { updateServer, removeServer } from "$lib/stores/serverStore"
+    import { slide } from 'svelte/transition';
 
     export let server: ServerWithStats
     export let open: boolean
 
     // Create a new ServerConfig object, copying the original
     let editedConfig: ServerConfig = { ...server.config }
-
+    let showAll = false
     const handleRemove = async () => {
         if (
             confirm(
@@ -27,39 +28,52 @@
         open = false
     }
 
+    const handleShowAll = () => {
+        showAll = !showAll
+    }
+
     const handleUpdate = async () => {
         await updateServer(editedConfig)
         open = false
     }
 </script>
 
-<Modal title="Edit Redis Instance" bind:open on:close={handleClose} size="xl">
-    <EditServerPanel bind:server={editedConfig} />
+<Modal title="Database Details" bind:open on:close={handleClose} size="md">
+    <EditServerPanel bind:server={editedConfig} stats={server.stats} />
 
     {#if server.stats}
-        <Accordion>
-            <AccordionItem>
-                <span slot="header">Statistics</span>
-                <div class="px-4 py-5 sm:p-6">
-                    <dl class="grid lg:grid-cols-3 grid-cols-2 gap-x-2 gap-y-4 ">
-                        {#each Object.entries(server.stats) as [key, value]}
-                            <div class="sm:col-span-1">
-                                <dt class="text-sm font-medium overflow-hidden text-gray-500 dark:text-slate-100">
-                                    {key}
-                                </dt>
-                                <dd class="mt-1 overflow-hidden text-sm text-gray-900 dark:text-white font-mono">
-                                    {value}
-                                </dd>
-                            </div>
-                        {/each}
-                    </dl>
-                </div>
-            </AccordionItem>
-        </Accordion>
+        <div class="">
+            <div class="flex items-center justify-center">
+                <button
+                    class=" text-blue-500 text-sm underline"
+                    on:click={handleShowAll}
+                >
+                    {showAll ? "Show Less" : "Show All Statistics"}
+                </button>
+            </div>
+            <h3 class="{showAll ? '' : 'hidden'} text-xs pt-2 pb-2 uppercase">Statistics</h3>
+            <dl
+                transition:slide
+                class="{showAll ? '' : 'hidden'} bg-gray-50 flex flex-col space-y-2 divide-y rounded-md"
+            >
+                {#each Object.entries(server.stats) as [key, value]}
+                    <div class="flex items-center justify-between p-2">
+                        <dt class="grow text-black overflow-hidden">
+                            {key}
+                        </dt>
+                        <dd class="font-mono text-gray-500">
+                            {value}
+                        </dd>
+                    </div>
+                {/each}
+            </dl>
+        </div>
     {/if}
     <svelte:fragment slot="footer">
         <div class="flex w-full space-x-2">
-            <button class="red-outline-button" on:click={handleRemove}>Remove Instance</button>
+            <button class="red-outline-button" on:click={handleRemove}
+                >Remove</button
+            >
             <div class="grow" />
             <button class="lime-button" on:click={handleUpdate}>Save</button>
         </div>

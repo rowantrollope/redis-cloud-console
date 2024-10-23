@@ -3,7 +3,8 @@
     import { createEventDispatcher } from "svelte"
     import { Modal } from "flowbite-svelte"
     import AddDatabase from "../../AddDatabase/AddDatabase.svelte"
-
+    import { APP_NAME } from "$lib/constants"
+    
     export let open = false
 
     const dispatch = createEventDispatcher()
@@ -35,7 +36,7 @@
         </ul>
         <p>
             Get started by adding your Redis instance and experience the power
-            of Redis Cloud Insight.
+            of {APP_NAME}.
         </p>
     </div>
     <div slot="footer" class="flex items-end w-full">

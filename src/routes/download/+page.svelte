@@ -6,6 +6,7 @@
         CloudArrowUpOutline,
         DatabaseOutline,
     } from "flowbite-svelte-icons"
+    import { APP_NAME } from "$lib/constants"
 
     const downloads = [
         {
@@ -21,7 +22,7 @@
             title: "Redis Connector",
             version: "1.0",
             description:
-                "Download the Redis Agent to connect Redis instances to Redis Cloud Insight. Redis Connector connects to all versions of Redis.",
+                `Download the Redis Agent to connect Redis instances to ${APP_NAME}. Redis Connector connects to all versions of Redis.`,
             icon: CloudArrowUpOutline,
             buttonText: "Download Redis Connector",
             link: "",
@@ -51,7 +52,7 @@
     <h1>Downloads</h1>
     <p>
         Download the latest version of Redis, our desktop management tool, or
-        our agent to connect your Redis instances to Redis Cloud Insight.
+        our agent to connect your Redis instances to {APP_NAME}.
     </p>
     <div class="w-full bg-white">
         <div

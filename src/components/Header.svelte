@@ -8,6 +8,7 @@
         DarkMode,
         NavHamburger,
     } from "flowbite-svelte"
+    import { APP_NAME_SHORT } from "$lib/constants"
 
     import { page } from "$app/stores"
     import { goto } from "$app/navigation"
@@ -37,7 +38,7 @@
     <NavBrand href="/">
         <img src="/redislogo.png" class="me-3 h-6" alt="Redis Logo" />
         <span class="text-lg font-normal mt-2 -ml-1 dark:text-slate-900 whitespace-nowrap">
-            Cloud Insight >
+            {APP_NAME_SHORT}
         </span>
     </NavBrand>
     <NavHamburger />

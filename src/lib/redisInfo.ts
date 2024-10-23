@@ -65,13 +65,17 @@ export async function openRedisInsight(server: ServerWithStats) {
     if (server.config.type === ServerType.REMOTE) {
         // retrieve host and port from /connect method on redis-cloud-server 
         // method takes querystring: ?redis_server_id= 
-        const response = await fetch(`http://127.0.0.1:8080/connect?redis_server_id=${server.config.id}`)
+        console.log("Opening RedisInsight through proxy server")
+        const response = await fetch(
+            `https://redis-proxy-server.onrender.com/connect?redis_server_id=${server.config.id}`
+        )
         const data = await response.json()
-        host = "127.0.0.1"
+        host = "https://redis-proxy-server.onrender.com"
         port = data.port
+        console.log(`Opening port to RedisInsight host: ${host} port: ${port}`)
     } else {
-        host = server.config.host
-        port = server.config.port.toString()
+        host = server.config.host ?? ""
+        port = server.config.port?.toString() ?? ""
     }
 
     const redisUri = encodeURIComponent(
