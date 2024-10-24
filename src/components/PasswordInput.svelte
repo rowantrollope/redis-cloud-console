@@ -11,7 +11,7 @@
 
 <div class="relative">
     <Input
-        class="dark:bg-slate-800 pr-10"
+        class="dark:bg-slate-800 pr-10 text-right border-none"
         type={showPassword ? "text" : "password"}
         id={id}
         bind:value

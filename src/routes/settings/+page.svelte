@@ -4,7 +4,7 @@
     import { get } from "svelte/store"
     import { Card } from "flowbite-svelte"
     import { DarkMode } from "flowbite-svelte"
-    import SettingsRow from "./SettingsRow.svelte" 
+    import SettingsRow from "../../components/SettingsRow.svelte" 
     import CloudAccounts from "./CloudAccounts.svelte"
 
     let userID = ""

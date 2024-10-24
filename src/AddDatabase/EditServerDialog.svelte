@@ -5,6 +5,7 @@
     import { Modal} from "flowbite-svelte"
     import { updateServer, removeServer } from "$lib/stores/serverStore"
     import { slide } from 'svelte/transition';
+    import SettingsRow from "../components/SettingsRow.svelte"
 
     export let server: ServerWithStats
     export let open: boolean
@@ -54,17 +55,16 @@
             <h3 class="{showAll ? '' : 'hidden'} text-xs pt-2 pb-2 uppercase">Statistics</h3>
             <dl
                 transition:slide
-                class="{showAll ? '' : 'hidden'} bg-gray-50 flex flex-col space-y-2 divide-y rounded-md"
+                class="{showAll ? '' : 'hidden'} bg-gray-50 flex flex-col rounded-md"
             >
                 {#each Object.entries(server.stats) as [key, value]}
-                    <div class="flex items-center justify-between p-2">
-                        <dt class="grow text-black overflow-hidden">
-                            {key}
-                        </dt>
-                        <dd class="font-mono text-gray-500">
+                    <SettingsRow>
+                        <div slot="left">{key}</div>
+                        <div slot="right" class="font-mono text-gray-500">
                             {value}
-                        </dd>
-                    </div>
+                        </div>
+                    </SettingsRow>
+                    
                 {/each}
             </dl>
         </div>

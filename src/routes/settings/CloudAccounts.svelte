@@ -2,7 +2,7 @@
     import { cloudAccounts, removeCloudAccount } from "$lib/stores/serverStore"
     import { servers } from "$lib/stores/serverStore"
     let addAccountModalOpen = false
-    import SettingsRow from "../settings/SettingsRow.svelte"
+    import SettingsRow from "../../components/SettingsRow.svelte"
     import EditCloudAccountPanel from "../../CloudAccount/EditCloudAccountPanel.svelte"
     import { type ServerConfig } from "$lib/types/types"
 

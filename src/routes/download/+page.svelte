@@ -21,11 +21,10 @@
         {
             title: "Redis Connector",
             version: "1.0",
-            description:
-                `Download the Redis Agent to connect Redis instances to ${APP_NAME}. Redis Connector connects to all versions of Redis.`,
+            description: `Download the Redis Agent to connect Redis instances to ${APP_NAME}. Redis Connector connects to all versions of Redis.`,
             icon: CloudArrowUpOutline,
             buttonText: "Download Redis Connector",
-            link: "",
+            link: "/redis-connector.zip",
         },
         {
             title: "Redis Insight",
@@ -55,10 +54,29 @@
         our agent to connect your Redis instances to {APP_NAME}.
     </p>
     <div class="w-full bg-white">
+        <div class="flex flex-col items-start justify-start p-4 mx-auto max-w-4xl">
+            <h1>Redis OSS / Community Edition</h1>
+            <div class="grid grid-cols-2 gap-4 p-4 max-w-4xl m-auto">
+                <Card class="flex flex-col items-startjustify-start space-y-4 shadow-none rounded-md">
+                    <h2>Step 1</h2>
+                    <p>{downloads[0].description}</p>
+                    <a href={downloads[0].link} class="lime-button w-full">
+                        {downloads[0].buttonText}
+                    </a>
+                </Card>
+                <Card class="flex flex-col items-start justify-start space-y-4 shadow-none rounded-md">
+                    <h2>Step 2</h2>
+                    <p>{downloads[1].description}</p>
+                    <a href="/download/connector" class="lime-button w-full">
+                        {downloads[1].buttonText}
+                    </a>
+                </Card>
+            </div>
+        </div>
         <div
             class="flex flex-col m-auto max-w-4xl space-y-4 w-full items-center justify-center mt-8 bg-white"
         >
-            {#each downloads as download}
+            {#each downloads.slice(2) as download}
                 <Card
                     size="xl"
                     class="flex flex-col w-full items-start border-none shadow-none rounded-none dark:bg-slate-700 dark:border-slate-300"
