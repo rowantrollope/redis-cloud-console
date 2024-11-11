@@ -2,9 +2,10 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte"
     import { Card } from "flowbite-svelte"
-    import AddDatabase from "../AddDatabase/AddDatabase.svelte"
+    import AddDatabase from "../components/AddDatabase/AddDatabase.svelte"
     import { goto } from "$app/navigation"
     import { APP_NAME } from "$lib/constants"
+    import { ChevronRightOutline } from "flowbite-svelte-icons"
 
     const dispatch = createEventDispatcher()
     let addDatabaseModalOpen = false
@@ -16,32 +17,41 @@
 </script>
 
 <section class="flex flex-col space-y-4">
-    <div class="-m-4 px-8 py-14 bg-slate-800 text-white">
-        <div class="text-white text-8xl sm:text-9xl trailers-text uppercase text-center">
+    <div class="-m-4 px-8 pt-14 bg-slate-800 text-white">
+        <div class="text-white py-14 tailerslarge trailers-text uppercase text-center">
+            Your app is about to get faster
+        </div>
+
+        <!-- <div class="text-white text-8xl sm:text-9xl trailers-text uppercase text-center">
             Manage Open Source Redis<br/>with <span class="text-lime-400">{APP_NAME} </span>
-        </div>
+        </div> -->
         <p class="text-center text-2xl">
-            {APP_NAME} lets you monitor and manage
-            your Redis databases, whether they are on Redis Cloud, Redis OSS or
-            Redis Enterprise.
+            <span class="text-lime-400">{APP_NAME}</span> lets you monitor and manage Redis Cloud, Redis OSS or Redis Enterprise.
         </p>
+        <div class="flex justify-center space-x-8 p-12 text-xl">
+            <a href="/console"class="lime-button">
+                <span class="px-4">
+                    Start Building
+                </span>
+            </a>
+            <button class="no-outline-button">
+                <span class="text-white hover:text-black">
+                    Get a demo
+                </span>
+                <ChevronRightOutline class="w-6 h-6 text-white" />
+            </button>
+        </div>
     </div>
-    <div class="hidden -m-4 py-4 justify-center bg-white text-black space-x-4">
-        <div>
-            Amazon
-        </div>
-        <div>
-            Google Cloud
-        </div>
-        <div>   
-            Azure
-        </div>
-        <div>
-            Redis Cloud
-        </div>
-        <div>
-            Redis Enterprise
-        </div>
+    <div class="-mx-4 pb-12 justify-center bg-slate-800 text-black flex space-x-12 items-center">
+        <img src="/Logo01.svg" class="h-12" alt="Amazon Web Services"/>
+        <img src="/Logo02.svg" class="h-8" alt="Google Cloud"/>
+        <img src="/Logo03.svg" class="h-10" alt="Microsoft Azure"/>
+    </div>
+    <div class="flex flex-col space-y-4 items-center justify-center p-8">
+        <h1 class="text-5xl">
+            Why Redis OneCloud
+        </h1>
+        <p class="text-xl">Manage all redis instances across OSS and all cloud providers</p>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 pt-8">
         <Card
@@ -119,5 +129,9 @@
     }
     .card-subtitle {
         @apply font-normal text-center;
+    }
+    .tailerslarge {
+        font-size: 12rem;
+        line-height: .8;
     }
 </style>

@@ -1,7 +1,5 @@
 import type { RequestHandler } from "./$types"
-import { getCloudAccount, getCloudDatabases } from "$lib/server/accounts"
-import type { ServerWithStats } from "$lib/types/types"
-import { json } from "@sveltejs/kit"
+import { getCloudAccount, getCloudDatabasesStream } from "$lib/server/accounts"
 
 export const GET: RequestHandler = async ({ params, locals }) => {
     const userID = locals.userId
@@ -19,18 +17,42 @@ export const GET: RequestHandler = async ({ params, locals }) => {
             return new Response("Account not found", { status: 404 })
         }
 
-        // Fetch databases for the specified account
-        const proDatabases = await getCloudDatabases(account, false)
-        const fixedDatabases = await getCloudDatabases(account, true)
-        const allDatabases: ServerWithStats[] = [
-            ...proDatabases,
-            ...fixedDatabases,
-        ]
+        // Create a ReadableStream to stream data back to the client
+        const stream = new ReadableStream({
+            async start(controller) {
+                try {
+                    // Fetch databases using async generators
+                    const proDatabases = getCloudDatabasesStream(account, false)
+                    const fixedDatabases = getCloudDatabasesStream(account, true)
+
+                    // Stream pro databases
+                    for await (const database of proDatabases) {
+                        controller.enqueue(JSON.stringify(database) + '\n')
+                    }
+
+                    // Stream fixed databases
+                    for await (const database of fixedDatabases) {
+                        controller.enqueue(JSON.stringify(database) + '\n')
+                    }
+                } catch (error) {
+                    console.error("Error while streaming databases:", error)
+                    controller.error(error)
+                } finally {
+                    // Close the stream when done
+                    controller.close()
+                }
+            },
+        })
 
         console.log(
-            `GET /api/cloud-databases/${accountId}/databases - Databases fetched: ${allDatabases.length}`
+            `GET /api/cloud-accounts/${accountId}/databases - Streaming databases`
         )
-        return json(allDatabases)
+
+        return new Response(stream, {
+            headers: {
+                'Content-Type': 'application/x-ndjson', // Use NDJSON format
+            },
+        })
     } catch (error) {
         console.error("Error fetching cloud databases:", error)
         return new Response("Failed to fetch cloud databases", { status: 500 })

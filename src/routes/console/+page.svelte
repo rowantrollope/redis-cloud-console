@@ -9,8 +9,9 @@
     import FaCheckCircle from "svelte-icons/fa/FaCheckCircle.svelte"
     import StatCard from "../../components/StatCard.svelte"
     import InstanceTable from "../../components/InstanceTable/InstanceTable.svelte"
-    import { refreshServer} from "$lib/stores/serverStore"
+    import { refreshServer } from "$lib/stores/serverStore"
     import QuickStart from "./QuickStart.svelte"
+    import SupportCard from "./SupportCard.svelte"
 
     import {
         calculateTotalMemory,
@@ -27,8 +28,8 @@
     import { servers } from "$lib/stores/serverStore"
 
     let loaded = false
-    let quickStartModalOpen = false 
-   let timeoutId: ReturnType<typeof setTimeout> | null = null
+    let quickStartModalOpen = false
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
 
     onMount(() => {
         loaded = true
@@ -36,17 +37,17 @@
         interval = setInterval(() => {
             // loop through all servers and refresh stats
             $servers.forEach((server) => {
+                //console.log("REFRESH", server.config.name)
                 refreshServer(server)
             })
         }, refreshInterval)
 
-       // Set a timeout to check servers after a delay
+        // Set a timeout to check servers after a delay
         timeoutId = setTimeout(() => {
-            if ($servers.length === 0) { 
+            if ($servers.length === 0) {
                 quickStartModalOpen = true
             }
         }, 2000) // 1000 milliseconds (1 second)
-
     })
 
     // Set up an interval to refresh data every few seconds
@@ -83,7 +84,9 @@
                     current={calculateTotalMemory($servers)}
                     max={calculateTotalAvailableMemory($servers)}
                 />
-
+                <div class="row-span-3 justify-items-start">
+                    <SupportCard />
+                </div>
                 <StatCard
                     title="Connected Clients"
                     value={calculateTotalClients($servers)}

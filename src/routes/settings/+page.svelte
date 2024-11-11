@@ -12,19 +12,20 @@
 
     onMount(() => {
         userID = get(userStore).userID
+        refreshInterval = get(userStore).refreshInterval
     })
 
     async function handleSubmit() {
         // Update the userStore
-        userStore.set({ userID })
+        userStore.set({ userID, refreshInterval })
 
         // Send the new userID to the server to update the cookie
         const response = await fetch("/api/user", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ userID }),
+            body: JSON.stringify({ userID, refreshInterval }),
         })
-
+        
         if (response.ok) {
             alert("User ID updated successfully")
             // Optionally, you can redirect or reload the page
@@ -32,6 +33,20 @@
         } else {
             const errorData = await response.json()
             alert(`Failed to update User ID: ${errorData.error}`)
+        }
+
+        // Update the user settings
+        const settingsResponse = await fetch("/api/usersettings", {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ userID, refreshInterval }),
+        })
+
+        if (settingsResponse.ok) {
+            alert("User settings updated successfully")
+        } else {
+            const errorData = await settingsResponse.json()
+            alert(`Failed to update user settings: ${errorData.error}`)
         }
     }
 </script>

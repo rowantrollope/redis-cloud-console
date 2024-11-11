@@ -50,6 +50,14 @@
          hover:text-black
         hover:bg-lime-500;
 }
+.slate-button {
+    @apply button-base
+        bg-slate-500
+        text-white
+        border-black
+        hover:bg-slate-700
+        hover:text-white;
+}
 .red-button {
     @apply button-base
         bg-primary-500 

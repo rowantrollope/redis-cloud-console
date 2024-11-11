@@ -46,22 +46,43 @@ export async function disconnectRedisClient(id: string): Promise<void> {
         delete clients[id]
     }
 }
+
 export async function readRedisInfo(
     config: ServerConfig
 ): Promise<ServerStats> {
     try {
+        // ensure that the host and port are set and valid
+        if (
+            !config.host ||
+            !config.port ||
+            config.port === 0 ||
+            config.host === ""
+        ) {
+            return {}
+        }
+
         const client = createClient({
             socket: {
                 host: config.host,
                 port: config.port,
             },
-            username: config.username || 'default',
+            username: config.username || "default",
             password: config.password,
         })
+
+        client.on("error", (err) => {
+            console.error(`Redis client error for ${config.name}:`, err)
+            return {}
+        })
+
         await client.connect()
+        console.log(
+            `Connected to Redis server ${config.name} at ${config.host}:${config.port}`
+        )
 
         const infoRaw = await client.info()
         const stats = parseRedisInfo(infoRaw)
+        stats.timestamp = Math.floor(Date.now() / 1000).toString() // Convert to Unix timestamp
 
         await client.disconnect()
         return stats

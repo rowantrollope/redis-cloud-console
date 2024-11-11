@@ -14,6 +14,6 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
         sameSite: "lax",
         secure: true,
     })
-
+    
     return json({ success: true })
 }

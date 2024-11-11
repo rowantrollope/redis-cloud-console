@@ -101,6 +101,21 @@ export async function removeCloudAccount(
     }
 }
 
+export async function* getCloudDatabasesStream(account: RedisCloudAccount, isFixed: boolean) {
+    try {
+        console.log("getCloudDatabasesStream", account.id, isFixed)
+        // Iterate over the async generator returned by fetchDatabases
+        for await (const database of fetchDatabases(account, isFixed)) {
+            yield database;
+        }
+    } catch (error) {
+        console.error(
+            `Error fetching databases for account ${account.id}:`,
+            error
+        );
+        throw error;
+    }
+}
 
 // Helper function to get databases from both subscription types
 export async function getCloudDatabases(
@@ -226,7 +241,7 @@ function mapDatabaseToServerWithStats(
 ): ServerWithStats {
 
     // remove port from publicEndpoint 
-    const [host, port] = db.publicEndpoint.split(":")
+    const [host, port] = db.publicEndpoint ? db.publicEndpoint.split(":") : ["", ""]
 
     const serverConfig: ServerConfig = {
         id: db.databaseId.toString(),
@@ -250,5 +265,96 @@ function mapDatabaseToServerWithStats(
         stats: db,
         error: null,
         state: ServerState.SUCCESS,
+    }
+}
+
+// Fetch databases for a given account and subscription type
+async function* fetchDatabases(
+    account: RedisCloudAccount,
+    isFixed: boolean
+): AsyncGenerator<ServerWithStats> {
+    const headers = {
+        "x-api-key": account.accountKey,
+        "x-api-secret-key": account.apiKey,
+        "Content-Type": "application/json",
+    };
+
+    const subscriptionType = isFixed ? "fixed/" : "";
+    const subscriptionsUrl = `https://api.redislabs.com/v1/${subscriptionType}subscriptions`;
+
+    // Fetch subscriptions for the account
+    const subscriptionsResponse = await fetch(subscriptionsUrl, {
+        method: "GET",
+        headers: headers,
+    });
+
+    if (!subscriptionsResponse.ok) {
+        console.error("Failed to fetch subscriptions for account", account.name)
+        throw new Error(
+            `Failed to fetch subscriptions for account ${account.name}`
+        );
+    } else {
+        console.log("Fetched subscription count: ", subscriptionsResponse.status)
+    }
+
+    const subscriptionsData = await subscriptionsResponse.json();
+
+    if (!subscriptionsData.subscriptions.length) {
+        console.log("No subscriptions found for account", account.name);
+        return;
+    } else {
+        console.log(
+            "Fetched subscription count: ",
+            subscriptionsData.subscriptions.length
+        );
+    }
+
+    // Iterate over subscriptions
+    for (const subscription of subscriptionsData.subscriptions) {
+        const subscriptionId = subscription.id;
+
+        const databasesUrl = `https://api.redislabs.com/v1/${subscriptionType}subscriptions/${subscriptionId}/databases?offset=0&limit=100`;
+
+        // Fetch databases for each subscription
+        const databasesResponse = await fetch(databasesUrl, {
+            method: "GET",
+            headers: headers,
+        });
+
+        if (!databasesResponse.ok) {
+            console.error(
+                `Failed to fetch databases for subscription ${subscriptionId}`
+            );
+            continue;
+        }
+
+        const databasesData = await databasesResponse.json();
+
+        const databases = isFixed
+            ? databasesData.subscription?.databases || []
+            : databasesData.subscription?.flatMap(
+                  (subs: any) => subs.databases
+              ) || [];
+
+        for (const db of databases) {
+            // Fetch full database details
+            const dbDetails = await fetchDatabaseDetails(
+                account,
+                subscriptionId,
+                db.databaseId,
+                isFixed
+            );
+            console.log(
+                `Fetched database ${db.name} from subscription ${subscriptionId}`
+            );
+
+            if (dbDetails) {
+                const serverWithStats = mapDatabaseToServerWithStats(
+                    account,
+                    dbDetails
+                );
+                yield serverWithStats;
+            }
+        }
     }
 }

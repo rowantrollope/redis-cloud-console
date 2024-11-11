@@ -24,42 +24,105 @@ export async function fetchCloudAccounts() {
     }
 }
 
-export async function fetchAllCloudDatabases(): Promise<ServerWithStats[]> {
+export async function* fetchAllCloudDatabases(): AsyncGenerator<ServerWithStats> {
     try {
-        const response = await fetch("/api/cloud-databases")
-        if (!response.ok) {
-            throw new Error("Failed to fetch cloud databases")
+        const response = await fetch("/api/cloud-databases");
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error("No reader found");
+        }
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            let lines = buffer.split('\n');
+            buffer = lines.pop() || ''; // Save incomplete JSON
+
+            for (const line of lines) {
+                if (line.trim()) {
+                    try {
+                        const server: ServerWithStats = JSON.parse(line);
+                        yield server; // Yield each server as it's parsed
+                    } catch (parseError) {
+                        console.error("Error parsing server data:", parseError);
+                    }
+                }
+            }
         }
 
-        const cloudDatabases: ServerWithStats[] = await response.json()
-        return cloudDatabases
+        // Handle any remaining data in buffer
+        if (buffer.trim()) {
+            try {
+                const server: ServerWithStats = JSON.parse(buffer);
+                yield server;
+            } catch (parseError) {
+                console.error("Error parsing server data:", parseError);
+            }
+        }
     } catch (error) {
-        console.error("Error fetching cloud databases:", error)
-        return []
+        console.error("Error fetching cloud databases:", error);
     }
 }
-export async function fetchCloudAccountDatabases(
+
+export async function* fetchCloudAccountDatabases(
     accountId: string
-): Promise<ServerWithStats[]> {
+): AsyncGenerator<ServerWithStats> {
     try {
+        console.log("fetchCloudAccountDatabases", accountId);
         const response = await fetch(
             `/api/cloud-accounts/${accountId}/databases`
-        )
-        if (!response.ok) {
-            throw new Error("Failed to fetch cloud databases")
+        );
+        const reader = response.body?.getReader();
+        if (!reader) {
+            throw new Error("ReadableStream not supported in this browser.");
+        }
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            buffer += decoder.decode(value, { stream: true });
+
+            let lines = buffer.split('\n');
+            buffer = lines.pop() || ''; // Save incomplete JSON
+
+            for (const line of lines) {
+                if (line.trim()) {
+                    try {
+                        const server: ServerWithStats = JSON.parse(line);
+                        console.log("Received server:", server);
+                        yield server; // Yield each server as it's parsed
+                    } catch (err) {
+                        console.error("Error parsing server data:", err);
+                    }
+                }
+            }
         }
 
-        const cloudDatabases: ServerWithStats[] = await response.json()
-        return cloudDatabases
+        // Handle any remaining data in the buffer
+        if (buffer.trim()) {
+            try {
+                const server: ServerWithStats = JSON.parse(buffer);
+                console.log("Received server:", server);
+                yield server;
+            } catch (err) {
+                console.error("Error parsing server data:", err);
+            }
+        }
     } catch (error) {
-        console.error("Error fetching cloud databases:", error)
-        return []
+        console.error("Error fetching cloud databases:", error);
     }
 }
 
 export async function initializeServerStore(initialServers: ServerConfig[]) {
     try {
-        // Initialize servers
+        console.log("initializeServerStore", initialServers)
+        // Initialize servers with initial configurations
         let serversWithStats = initialServers.map((server) => ({
             config: server,
             stats: null,
@@ -67,25 +130,41 @@ export async function initializeServerStore(initialServers: ServerConfig[]) {
             state: ServerState.UNKNOWN,
         })) as ServerWithStats[]
 
-        const LOAD_CLOUD_SERVERS = true
-
-        // Cloud Servers (OLD CODE TODO: UPDATE)
-        if (LOAD_CLOUD_SERVERS) {
-            // TODO: get the cloud servers
-            const cloudServers = await fetchAllCloudDatabases()
-            serversWithStats = [...serversWithStats, ...cloudServers]
-            // combine the initial servers with the cloud servers
-        }
+        // Initially set the servers store with the initial servers
+        servers.set(serversWithStats)
 
         if (serversWithStats.length > 0) {
-            await initializeServerStats(serversWithStats)
+            console.log("initializeServerStore: initializing server stats")
+            for (const server of serversWithStats) {
+                refreshServer(server)
+            }
         }
 
-        servers.set(serversWithStats)
+        const LOAD_CLOUD_SERVERS = true
+
+        if (LOAD_CLOUD_SERVERS) {
+            // Fetch cloud servers and update the servers store dynamically
+            for await (const server of fetchAllCloudDatabases()) {
+                // Initialize server state
+                const newServer: ServerWithStats = {
+                    config: server.config,
+                    stats: null,
+                    error: null,
+                    state: ServerState.CONNECTING,
+                }
+
+                // Add the new server to the servers store
+                servers.update((current) => [...current, newServer])
+                // Refresh server stats
+                refreshServer(newServer)
+            }
+        }
+        console.log("initializeServerStore DONE")
     } catch (error) {
         console.error("Error initializing stores:", error)
     }
 }
+
 export async function initializeCloudAccountStore(
     initialCloudAccounts: RedisCloudAccount[]
 ) {
@@ -93,36 +172,24 @@ export async function initializeCloudAccountStore(
     cloudAccounts.set(initialCloudAccounts)
 }
 
-// Initialize servers with data (used on client-side)
-export async function initializeServerStats(initialServers: ServerWithStats[]) {
-    try {
-        console.log("initializeServerStats", initialServers)
-
-        initialServers.forEach((server: ServerWithStats) =>
-            refreshServer(server)
-        )
-    } catch (error) {
-        console.error("Error initializing servers:", error)
-    }
-}
-
 // Refresh stats for a specific server
 export async function refreshServer(server: ServerWithStats) {
-    server.state = ServerState.CONNECTING
+
+    server.state = ServerState.CONNECTING;
 
     if (server.config.type === ServerType.REMOTE) {
         // Fetch stats via redis-cloud-server
-        console.log("fetching info for remote server", server.config.id)
+        console.log("fetching info for remote server", server.config.id);
         try {
-            const data = await fetchRemoteServer(server.config.id)
-            console.log("stats", data.stats)
+            const data = await fetchRemoteServer(server.config.id);
+            console.log("stats", data.stats);
 
-            server.config.status = data.serverInfo.status
-            server.config.timestamp = data.serverInfo.timestamp
-            server.config.activation_state = data.serverInfo.activation_state
-            server.config.account_id = data.serverInfo.account_id
-            server.config.agent_id = data.serverInfo.agent_id
-                
+            server.config.status = data.serverInfo.status;
+            server.config.timestamp = data.serverInfo.timestamp;
+            server.config.activation_state = data.serverInfo.activation_state;
+            server.config.account_id = data.serverInfo.account_id;
+            server.config.agent_id = data.serverInfo.agent_id;
+
             servers.update((current) =>
                 current.map((s) =>
                     s.config.id === server.config.id
@@ -135,12 +202,12 @@ export async function refreshServer(server: ServerWithStats) {
                           }
                         : s
                 )
-            )
+            );
         } catch (error: any) {
             console.error(
                 `Error refreshing stats for REMOTE server ${server.config.id}:`,
                 error
-            )
+            );
             servers.update((current) =>
                 current.map((s) =>
                     s.config.id === server.config.id
@@ -151,12 +218,12 @@ export async function refreshServer(server: ServerWithStats) {
                           }
                         : s
                 )
-            )
+            );
         }
     } else {
         console.log(
             `loading stats for ${server.config.id} ${server.config.type}`
-        )
+        );
         try {
             const response = await fetch(
                 `/api/redisstats?id=${
@@ -167,11 +234,11 @@ export async function refreshServer(server: ServerWithStats) {
                 {
                     credentials: "include",
                 }
-            )
+            );
             if (!response.ok) {
-                throw new Error("Failed to fetch stats")
+                throw new Error("Failed to fetch stats");
             }
-            const stats = await response.json()
+            const stats = await response.json();
 
             servers.update((current) =>
                 current.map((s) =>
@@ -184,9 +251,9 @@ export async function refreshServer(server: ServerWithStats) {
                           }
                         : s
                 )
-            )
+            );
         } catch (error: any) {
-            console.error(`Error refreshing server ${server.config.id}:`, error)
+            console.error(`Error refreshing server ${server.config.id}:`, error);
             servers.update((current) =>
                 current.map((s) =>
                     s.config.id === server.config.id
@@ -198,7 +265,7 @@ export async function refreshServer(server: ServerWithStats) {
                           }
                         : s
                 )
-            )
+            );
         }
     }
 }
@@ -300,26 +367,33 @@ export async function addCloudAccount(account: RedisCloudAccount) {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(account),
-        })
+        });
 
         if (!response.ok) {
-            throw new Error("Failed to add cloud account")
+            throw new Error("Failed to add cloud account");
         }
 
-        // Optionally, you can update the local store upon success
-        cloudAccounts.update((accounts) => [...accounts, account])
+        // Update the cloud accounts store
+        cloudAccounts.update((accounts) => [...accounts, account]);
 
-        // Update the server list to include new cloud databases
+        // Collect servers from the async generator
+        const newServers: ServerWithStats[] = [];
+        for await (const server of fetchCloudAccountDatabases(account.id)) {
+            newServers.push(server);
+        }
 
-        // TODO: fetch servers from the cloud account
-        // TODO: update the server list with the new servers
-        // TODO: update the UI to show the new servers
+        // Update the servers store with the new servers
         servers.set([
             ...get(servers),
-            ...(await fetchCloudAccountDatabases(account.id)),
-        ])
+            ...newServers,
+        ]);
+
+        // Optionally, refresh server stats for the new servers
+        for (const server of newServers) {
+            refreshServer(server);
+        }
     } catch (error) {
-        console.error("Error adding cloud account:", error)
+        console.error("Error adding cloud account:", error);
     }
 }
 

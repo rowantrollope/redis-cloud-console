@@ -1,7 +1,7 @@
 <script lang="ts">
-    import PasswordInput from "../components/PasswordInput.svelte"
+    import PasswordInput from "../PasswordInput.svelte"
     import { APP_NAME } from "$lib/constants"
-    import SettingsRow from "../components/SettingsRow.svelte"
+    import SettingsRow from "../SettingsRow.svelte"
 
     import { Input, Label } from "flowbite-svelte"
     import { type ServerConfig, type ServerStats } from "$lib/types/types"

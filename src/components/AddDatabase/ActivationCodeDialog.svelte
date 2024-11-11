@@ -77,7 +77,7 @@
 </script>
 
 <Modal title="Enter Activation Code" bind:open>
-    <div class="p-4 flex items-center flex-col space-y-4 justify-center">
+    <div class="p-4 flex items-center flex-col space-y-6 justify-center">
         
         <div>
             <label
@@ -87,11 +87,14 @@
             >
             <ActivationCodeInput on:input={handleCodeInput} />
         </div>
+        <div class="font-bold text-black">Find the activation code in the redis-server output:</div>
+        <img class="border-2 border-gray-300 rounded-md shadow-md" src="/activation-code.jpg" alt="Activation code" />
         {#if error}
             <p class="mt-2 text-sm text-red-600">{error}</p>
         {/if}
     </div>
     <div slot="footer" class="flex items-end w-full">
+        <a href="/download" class="text-blue-500">Don't have Redis installed? Download here</a>
         <div class="grow"></div>
 
         <button

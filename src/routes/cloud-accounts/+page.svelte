@@ -1,5 +1,5 @@
 <script lang="ts">
-    import RedisCloudAccountPanel from "../../CloudAccount/RedisCloudAccountPanel.svelte"
+    import RedisCloudAccountPanel from "../../components/CloudAccount/RedisCloudAccountPanel.svelte"
 
 </script>
 

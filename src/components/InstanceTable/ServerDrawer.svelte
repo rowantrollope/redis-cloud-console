@@ -4,7 +4,7 @@
     import { ArrowRightOutline, DatabaseOutline } from "flowbite-svelte-icons"
     import { sineInOut } from "svelte/easing"
     import ServerStatsDialog from "./ServerStatsDialog.svelte"
-    import EditServerDialog from "../../AddDatabase/EditServerDialog.svelte"
+    import EditServerDialog from "../../components/AddDatabase/EditServerDialog.svelte"
     import { createEventDispatcher } from "svelte"
     import { APP_NAME } from "$lib/constants"
     

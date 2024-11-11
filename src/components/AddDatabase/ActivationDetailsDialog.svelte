@@ -1,11 +1,11 @@
 <script lang="ts">
     import { Modal, Input, Label, Button } from "flowbite-svelte";
     import { createEventDispatcher } from "svelte";
-    import type { RemoteServerConfig } from "$lib/types/types";
-    import PasswordInput from "../components/PasswordInput.svelte"; 
+    import type { ServerConfig } from "$lib/types/types";
+    import PasswordInput from "../PasswordInput.svelte"; 
 
     export let open: boolean;
-    export let server: RemoteServerConfig;
+    export let server: ServerConfig;
     export let code: string;
 
     const dispatch = createEventDispatcher();

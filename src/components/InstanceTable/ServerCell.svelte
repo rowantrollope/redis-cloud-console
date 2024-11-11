@@ -50,7 +50,7 @@
             new Date(now.setDate(now.getDate() - 1)).toDateString()
 
         if (isToday) {
-            return "Today"
+            return ""
         } else if (isYesterday) {
             return "Yesterday"
         } else {
@@ -127,12 +127,14 @@
             <div class="flex space-x-2">-</div>
         {:else}
             <div class="flex space-x-2">
-                <AnimatedNumber
-                    textStyle="font-semibold"
-                    value={server.stats?.used_cpu_sys}
-                    precision={2}
-                />
-                <span>%</span>
+                {#if server.stats?.used_cpu_sys}
+                    <AnimatedNumber
+                        textStyle="font-semibold"
+                        value={server.stats?.used_cpu_sys}
+                        precision={2}
+                    />
+                    <span>%</span>
+                {/if}
             </div>
         {/if}
     {:else if columnKey === "provider"}
@@ -144,7 +146,7 @@
     {:else if columnKey === "memory"}
         {#if server.state === ServerState.SUCCESS && server.stats?.used_memory}
             {server.stats?.used_memory_human} / {server.stats
-                ?.total_system_memory_human ?? "N/A"}
+                ?.total_system_memory_human ?? "-"}
         {:else}
             -
         {/if}
@@ -168,7 +170,6 @@
         {:else}
             -
         {/if}
-
     {:else if columnKey === "commands"}
         {#if server.config.type === ServerType.REMOTE && server.config.status === "RUNNING"}
             <div class="flex space-x-2">
@@ -203,15 +204,21 @@
                   parseInt(server.stats?.keyspace_hits || "0"),
                   parseInt(server.stats?.keyspace_misses || "0")
               )
-            : "N/A"}
+            : "-"}
     {:else if columnKey === "actions"}
-        <ActionButton
-            {server}
-            on:refresh={refreshClicked}
-            on:connect={connectClicked}
-            on:edit={editClicked}
-            on:menu={menuClicked}
-            on:remove={removeClicked}
-        />
+        <div>
+            {#if getRedisVersion(server).startsWith("OSS")}
+                <a href="/upgrade/{server.config.id}" class="lime-button">Upgrade</a>
+            {/if}
+
+            <!-- <ActionButton
+                {server}
+                on:refresh={refreshClicked}
+                on:connect={connectClicked}
+                on:edit={editClicked}
+                on:menu={menuClicked}
+                on:remove={removeClicked}
+            /> -->
+        </div>
     {/if}
 </section>

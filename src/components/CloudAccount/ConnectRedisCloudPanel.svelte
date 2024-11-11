@@ -1,6 +1,6 @@
 <script lang="ts">
     import { Label } from "flowbite-svelte"
-    import PasswordInput from '../components/PasswordInput.svelte';
+    import PasswordInput from '../PasswordInput.svelte';
     import { type RedisCloudAccount } from '$lib/types/types';
     
     export let account: RedisCloudAccount | null = null
@@ -9,7 +9,7 @@
 
 <div class="w-full flex flex-col gap-2">    
     <div class="mb-4">
-        <Label for="accountApiKey" class="mb-2">Account API Key</Label>
+        <Label for="accountApiKey" class="mb-2">API Account Key</Label>
         <PasswordInput
             bind:value={account.accountKey}
             id="accountApiKey"

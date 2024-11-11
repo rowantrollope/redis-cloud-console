@@ -1,6 +1,6 @@
 <!-- src/routes/activation.svelte -->
 <script lang="ts">
-    import ActivationCodeDialog from "../../AddDatabase/ActivationCodeDialog.svelte";
+    import ActivationCodeDialog from "../../components/AddDatabase/ActivationCodeDialog.svelte";
     import { goto } from '$app/navigation';
     let open = true;
 

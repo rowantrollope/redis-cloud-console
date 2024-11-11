@@ -3,28 +3,35 @@ import { writable } from "svelte/store"
 interface Column {
     key: string
     label: string
+    longName: string
 }
 
 // Define available columns
 export const availableColumns: Column[] = [
-    { key: "name", label: "Name" },
-    { key: "host", label: "Host" },
-    { key: "provider", label: "Provider" },
-    { key: "version", label: "Version" },
-    { key: "cpu", label: "CPU %" },
-    { key: "memory", label: "Memory" },
-    { key: "uptime", label: "Uptime" },
-    { key: "clients", label: "Clients" },
-    { key: "commands", label: "Commands" },
-    { key: "keyspaceHit", label: "Keyspace Hit %" },
-    { key: "status", label: "Status" },
-    { key: "lastHeartbeat", label: "Last Heartbeat" },
-    { key: "actions", label: "Actions" },
+    { key: "name", label: "Name", longName: "Database Name" },
+    { key: "status", label: "Status", longName: "Database Status" },
+    { key: "host", label: "Host", longName: "Database Host/IP address" },
+    { key: "version", label: "Version", longName: "Database Version" },
+    { key: "cpu", label: "CPU %", longName: "CPU Usage Percentage" },
+    { key: "memory", label: "Memory", longName: "Memory Usage" },
+    { key: "uptime", label: "Uptime", longName: "Database Uptime" },
+    { key: "clients", label: "Clients", longName: "Number of Clients" },
+    { key: "commands", label: "Commands", longName: "Number of Commands" },
+    {
+        key: "keyspaceHit",
+        label: "Keyspace Hit %",
+        longName: "Keyspace Hit Percentage",
+    },
+    {
+        key: "lastHeartbeat",
+        label: "Last Heartbeat",
+        longName: "Last Heartbeat",
+    },
+    { key: "actions", label: "Actions", longName: "Action button" },
 ]
 
 const defaultSelectedColumns = [
     "name",
-    "provider",
     "version",
     "cpu",
     "commands",

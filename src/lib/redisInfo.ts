@@ -32,21 +32,20 @@ export function serverOnline(server: ServerWithStats): boolean {
 }
 export function getRedisVersion(server: ServerWithStats): string {
     if (server.stats?.redis_version == "255.255.255") {
-        return "7.4 (OSS/CE)"
+        return "OSS/CE: 7.4"
     }
-    return server.stats?.redis_version ?? "-"
 
     // if the host contains "redis-cloud" return "[version] on Redis Cloud
     if (server.config.host?.includes("redis-cloud")) {
-        return `${version}`
+        return `Redis Cloud: ${server.stats?.redis_version}`
     } else if (server.config.host?.includes("aws")) {
-        return `${version}`
+        return `AWS: ${server.stats?.redis_version}`
     } else if (server.config.host?.includes("azure")) {
-        return `${version}`
+        return `Azure: ${server.stats?.redis_version}`
     } else if (server.config.host?.includes("memorystore")) {
-        return `${version}`
+        return `GCP: ${server.stats?.redis_version}`
     } else {
-        return `${version}`
+        return `${server.stats?.redis_version}`
     }
 }
 export function getLatestVersion(servers: ServerWithStats[]): string {
@@ -163,7 +162,7 @@ export function formatMemory(bytes: number): string {
  */
 export function calculateKeyspaceHitPercentage(hits: number, misses: number): string {
     const total = hits + misses
-    if (total === 0) return "N/A"
+    if (total === 0) return "-"
     const percentage = (hits / total) * 100
     return `${percentage.toFixed(2)}%`
 }

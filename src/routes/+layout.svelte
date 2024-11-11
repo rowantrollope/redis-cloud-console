@@ -3,24 +3,28 @@
     import "../app.css"  
     import { onMount } from "svelte"
     import { initializeServerStore, initializeCloudAccountStore } from "$lib/stores/serverStore"
-    import { userStore } from "$lib/stores/userStore"; // Import the user store
+    import { userStore, initializeUserSettings } from "$lib/stores/userStore"; // Import the user store
     import type { PageData } from "./$types.js"
 
     export let data: PageData
 
     onMount(async () => {
-        // Set the userID in the userStore
-        userStore.set({ userID: data.userID || "" });
-
-        initializeServerStore(data.initialServers || [])
+        // Set the userID in the userStore        
+        if (data.userID) {
+            await initializeUserSettings(data.userID)
+        }
 
         initializeCloudAccountStore(data.initialCloudAccounts || [])
+        
+        initializeServerStore(data.initialServers || [])
+
+        initializeUserSettings(data.userID || "")
 
     })
 
-        // Watch for changes in data.userID
+    // Watch for changes in data.userID
     $: if (data.userID) {
-        userStore.set({ userID: data.userID });
+        userStore.update(settings => ({ ...settings, userID: data.userID }));
     }
 
 </script>

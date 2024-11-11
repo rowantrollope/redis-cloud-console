@@ -4,7 +4,7 @@
     import { addCloudAccount } from "$lib/stores/serverStore"
     import { Modal, Label, Input } from "flowbite-svelte"
     import type { RedisCloudAccount } from "$lib/types/types"
-    import PasswordInput from "../components/PasswordInput.svelte"
+    import PasswordInput from "../PasswordInput.svelte"
 
     export let open: boolean
     let account: RedisCloudAccount = {
@@ -28,20 +28,20 @@
             <Input id="accountName" bind:value={account.name} placeholder="Enter the name of this account" required tabIndex="1"/>
         </div>
         <div>
-            <Label for="accountKey">Account API Key</Label>
+            <Label for="accountKey">API Account Key</Label>
             <PasswordInput
                 id="accountKey"
                 bind:value={account.accountKey}
-                placeholder="Enter the account API key"
+                placeholder="Enter the API Account Key"
                 tabIndex="2"
             />
         </div>
         <div>
-            <Label for="userApiKey">User API Key</Label>
+            <Label for="userApiKey">API User Key</Label>
             <PasswordInput
                 id="userApiKey"
                 bind:value={account.apiKey}
-                placeholder="Enter the user API key"
+                placeholder="Enter the API User Key"
                 tabIndex="3"
             />
         </div>

@@ -3,7 +3,7 @@
     import { servers } from "$lib/stores/serverStore"
     let addAccountModalOpen = false
     import SettingsRow from "../../components/SettingsRow.svelte"
-    import EditCloudAccountPanel from "../../CloudAccount/EditCloudAccountPanel.svelte"
+    import EditCloudAccountPanel from "../../components/CloudAccount/EditCloudAccountPanel.svelte"
     import { type ServerConfig } from "$lib/types/types"
 
     function handleAddAccount() {
@@ -49,19 +49,25 @@
             {#if $servers.length > 0}
                 <div class="p-4">
                     <h3 class="py-2">Databases in {account.name}:</h3>
+                    <table>
+                        <tr>
+                            <th class="text-left">Name</th>
+                            <th class="text-left">Host</th>
+                            <th class="text-left">Port</th>
+                        </tr>
                     {#each $servers as server}
                         {#if isCloudServerConfig(server.config) && server.config.cloudAccountId === account.id}
-                            <div class="flex space-x-2">
-                                <div class="font-bold">
+                            <tr>
+                                <td class="font-bold">
                                     {server.config.name}
-                                </div>
-                                <div class="font-thin">
-                                    Host: {server.config.host}
-                                </div>
-                                <div class="font-thin">
-                                    Port: {server.config.port}
-                                </div>
-                            </div>
+                                </td>
+                                <td class="font-thin">
+                                    {server.config.host}
+                                </td>
+                                <td class="font-thin">
+                                    {server.config.port}
+                                </td>
+                            </tr>
                         {/if}
                     {/each}
                 </div>

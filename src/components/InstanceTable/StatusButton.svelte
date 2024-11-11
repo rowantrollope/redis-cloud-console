@@ -14,7 +14,7 @@
               : "bg-yellow-200" // NO CONNECTION
     $: indicatorColor =
         server.state === ServerState.SUCCESS
-            ? "bg-green-500 dark:bg-lime-500" // CONNECTED
+            ? "bg-lime-500 dark:bg-lime-500 border border-lime-700 dark:border-lime-500" // CONNECTED
             : server.state === ServerState.ERROR
               ? "bg-red-500 dark:bg-primary-600" // ERROR
               : "bg-yellow-500" // NO CONNECTED
@@ -43,7 +43,7 @@
     {#if server.config.type === ServerType.REMOTE}
         {#if server.config.status === "RUNNING" && server.state === ServerState.SUCCESS}
             <Badge class="rounded py-0.5 bg-transparent text-black dark:bg-transparent dark:text-white">
-                <span class="rounded-full mr-1 w-3 h-3 bg-green-500 dark:bg-lime-500"></span>
+                <span class="rounded-full mr-1 w-3 h-3 bg-lime-500 dark:bg-lime-500"></span>
                 Running
             </Badge>
         {:else if server.state === ServerState.ERROR}
@@ -65,9 +65,9 @@
         {/if}
     {:else}
         {#if server.state === ServerState.CONNECTING}
-            <Badge class="flex items-center bg-white dark:bg-transparent">
-                <Spinner size="4" class="text-gray-500 mr-1" color="primary" />
-                <span class="text-gray-500 dark:text-white">Connecting</span>
+            <Badge class="rounded py-0.5 bg-transparent text-black dark:bg-transparent dark:text-white">
+                <span class="rounded-full mr-1 w-3 h-3 bg-gray-300 dark:bg-lime-500"></span>
+                Connecting
             </Badge>
         {:else}
             <Badge class="rounded px-2.5 py-0.5 {statusColor}">

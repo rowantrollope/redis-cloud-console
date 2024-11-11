@@ -2,11 +2,11 @@
 <script lang="ts">
     import { Modal } from "flowbite-svelte"
     import AddServerDialog from "./AddServerDialog.svelte"
-    import RedisCloudAccountDialog from "../CloudAccount/RedisCloudAccountDialog.svelte"
+    import RedisCloudAccountDialog from "../../components/CloudAccount/RedisCloudAccountDialog.svelte"
     import ActivationCodeDialog from "./ActivationCodeDialog.svelte"
-    import ParagraphButton from "../components/ParagraphButton.svelte"
+    import ParagraphButton from "../../components/ParagraphButton.svelte"
     import { ServerOutline, QrCodeOutline } from "flowbite-svelte-icons"
-    import RedisIcon from "../components/RedisIcon.svelte"
+    import RedisIcon from "../../components/RedisIcon.svelte"
     import { createEventDispatcher } from "svelte"
     import { goto } from "$app/navigation"
     const dispatch = createEventDispatcher()
@@ -23,7 +23,7 @@
     }
 
     function openAddCloudAccount() {
-        showAddCloudAccount = true
+        goto("/deploy")
         open = false
     }
 
@@ -46,7 +46,7 @@
     >
         <!-- New ParagraphButton -->
         <ParagraphButton
-            title="Activate an existing Redis OSS Database"
+            title="Add & Activate an existing Redis OSS Database"
             description="Activate a Redis OSS database with an activation code."
             on:click={openActivationCodeDialog}
         >
@@ -58,19 +58,7 @@
                 <QrCodeOutline size="lg" />
             </div>
         </ParagraphButton>
-         <ParagraphButton
-            title="Download & `Create a new Redis OSS Database"
-            description="Download Redis OSS software and create a new database."
-            on:click={() => goto("/download")}
-        >
-            <!-- Icon for activation code -->
-            <div
-                slot="icon"
-                class="bg-green-500 rounded-md text-white h-10 w-10 flex items-center justify-center"
-            >
-                <QrCodeOutline size="lg" />
-            </div>
-        </ParagraphButton>
+         
         <ParagraphButton
             title="Create database on Redis Cloud"
             description="Create a Redis Cloud database."

@@ -5,7 +5,7 @@
     import { Modal} from "flowbite-svelte"
     import { updateServer, removeServer } from "$lib/stores/serverStore"
     import { slide } from 'svelte/transition';
-    import SettingsRow from "../components/SettingsRow.svelte"
+    import SettingsRow from "../SettingsRow.svelte"
 
     export let server: ServerWithStats
     export let open: boolean
@@ -34,6 +34,7 @@
     }
 
     const handleUpdate = async () => {
+        console.log("handleUpdate", editedConfig)
         await updateServer(editedConfig)
         open = false
     }

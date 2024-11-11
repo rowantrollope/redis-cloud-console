@@ -2,7 +2,7 @@
 <script lang="ts">
     import { createEventDispatcher } from "svelte"
     import { Modal } from "flowbite-svelte"
-    import AddDatabase from "../../AddDatabase/AddDatabase.svelte"
+    import AddDatabase from "../../components/AddDatabase/AddDatabase.svelte"
     import { APP_NAME } from "$lib/constants"
     
     export let open = false
