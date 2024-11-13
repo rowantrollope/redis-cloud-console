@@ -7,7 +7,7 @@
     import EditServerDialog from "../../components/AddDatabase/EditServerDialog.svelte"
     import { createEventDispatcher } from "svelte"
     import { APP_NAME } from "$lib/constants"
-    
+    import { ServerType } from "$lib/types/types"
     const dispatch = createEventDispatcher()
     
     export let server: ServerWithStats
@@ -116,7 +116,10 @@
             <ArrowRightOutline class="w-5 h-5 ms-2" />
     </button>
         <button class="outline-button" on:click={handleEdit}>Edit Connection Details</button>
-        <button class="red-outline-button" on:click={() => dispatch("remove")}>Remove</button>
+        {#if server.config.type !== ServerType.CLOUD}
+        asdf
+            <button class="red-outline-button" on:click={() => dispatch("remove")}>Remove</button>
+        {/if}
     </div>
 </Drawer>
 

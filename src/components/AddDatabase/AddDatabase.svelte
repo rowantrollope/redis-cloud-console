@@ -39,7 +39,7 @@
 
 </script>
 
-<Modal title="Create or Add a Redis Database" bind:open>
+<Modal title="Create or Add Database" bind:open>
     <p>Choose an option to add your Redis database</p>
     <div
         class="flex flex-col divide-y divide-gray-100 border border-gray-100 rounded-lg"

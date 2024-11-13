@@ -1,5 +1,6 @@
 <!-- components/ServerCell.svelte -->
 <script lang="ts">
+	import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import ActionButton from "./ActionButton.svelte"
 
     import StatusButton from "./StatusButton.svelte"
@@ -208,7 +209,10 @@
     {:else if columnKey === "actions"}
         <div>
             {#if getRedisVersion(server).startsWith("OSS")}
-                <a href="/upgrade/{server.config.id}" class="lime-button">Upgrade</a>
+                <a href="/upgrade/{server.config.id}" class="outline-button">
+                    Upgrade
+                    <ArrowRightOutline class="w-5 h-5 pl-1" />
+                </a>
             {/if}
 
             <!-- <ActionButton

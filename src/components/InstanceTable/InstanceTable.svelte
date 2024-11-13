@@ -52,7 +52,6 @@
         console.log("handleMenu", server.config)
         serverDrawerOpen[server.config.id] = false
     }
-
 </script>
 
 <Card size="xl" padding="sm" class="card">
@@ -69,18 +68,17 @@
         {#if $servers.length > 0}
             <button
                 on:click={() => (addInstanceModalOpen = true)}
-                class="text-xs py-0 no-outline-button"
+                class="text-sm py-0 no-outline-button"
             >
                 <PlusOutline class="w-4 h-4 me-1" />
-                Add Database
+                <span class="text-black">Add</span>
             </button>
             <button
                 id="customize"
-                class="text-xs no-outline-button px-2 py-0"
+                class="text-sm no-outline-button px-2 py-0"
                 on:click={() => (columnsModalOpen = true)}
             >
                 <AdjustmentsHorizontalOutline class="w-4 h-4 me-1" />
-                Customize
             </button>
         {/if}
     </div>
@@ -98,8 +96,8 @@
             </TableHead>
             <TableBody>
                 {#each $servers as server}
-                    <TableBodyRow 
-                        class="cursor-pointer" 
+                    <TableBodyRow
+                        class="cursor-pointer"
                         on:click={() => handleMenu(server)}
                     >
                         {#each visibleColumns as column}

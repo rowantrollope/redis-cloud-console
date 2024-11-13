@@ -7,7 +7,7 @@
     import { type ServerConfig, type ServerStats } from "$lib/types/types"
 
     export let server: ServerConfig
-    export let stats: ServerStats
+    export let stats: ServerStats | undefined = undefined
 
     export let oneColumn = false
 </script>

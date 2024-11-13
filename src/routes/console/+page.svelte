@@ -42,12 +42,6 @@
             })
         }, refreshInterval)
 
-        // Set a timeout to check servers after a delay
-        timeoutId = setTimeout(() => {
-            if ($servers.length === 0) {
-                quickStartModalOpen = true
-            }
-        }, 2000) // 1000 milliseconds (1 second)
     })
 
     // Set up an interval to refresh data every few seconds

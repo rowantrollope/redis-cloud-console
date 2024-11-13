@@ -6,6 +6,7 @@
     import { updateServer, removeServer } from "$lib/stores/serverStore"
     import { slide } from 'svelte/transition';
     import SettingsRow from "../SettingsRow.svelte"
+    import { ServerType } from "$lib/types/types"
 
     export let server: ServerWithStats
     export let open: boolean
@@ -72,9 +73,11 @@
     {/if}
     <svelte:fragment slot="footer">
         <div class="flex w-full space-x-2">
+            {#if server.config.type !== ServerType.CLOUD}
             <button class="red-outline-button" on:click={handleRemove}
                 >Remove</button
             >
+            {/if}
             <div class="grow" />
             <button class="lime-button" on:click={handleUpdate}>Save</button>
         </div>
