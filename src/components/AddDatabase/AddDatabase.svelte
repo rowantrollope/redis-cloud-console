@@ -67,8 +67,8 @@
             <RedisIcon slot="icon" />
         </ParagraphButton>
         <ParagraphButton
-            title="Connect to Existing Database by IP/Hostname"
-            description="Add a Redis database by providing the IP/Hostname and port"
+            title="AWS Elasticache or GCP MemoryStore database"
+            description="Add a Redis database from AWS Elasticache or GCP MemoryStore"
             on:click={openAddServer}
         >
             <!-- Add Server Icon -->
@@ -79,6 +79,18 @@
                 <ServerOutline size="lg" />
             </div>
         </ParagraphButton>
+        <!-- <ParagraphButton
+            title="Connect to Existing Database by IP/Hostname"
+            description="Add a Redis database by providing the IP/Hostname and port"
+            on:click={openAddServer}
+        >
+            <div
+                slot="icon"
+                class="bg-black rounded-md text-white h-8 w-8 flex items-center justify-center"
+            >
+                <ServerOutline size="lg" />
+            </div>
+        </ParagraphButton> -->
     </div>
 </Modal>
 
