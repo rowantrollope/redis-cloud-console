@@ -117,7 +117,6 @@
     </button>
         <button class="outline-button" on:click={handleEdit}>Edit Connection Details</button>
         {#if server.config.type !== ServerType.CLOUD}
-        asdf
             <button class="red-outline-button" on:click={() => dispatch("remove")}>Remove</button>
         {/if}
     </div>

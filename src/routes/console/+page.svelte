@@ -42,6 +42,13 @@
             })
         }, refreshInterval)
 
+        // open quick start modal if no servers, but only after 2 seconds
+        // this is to prevent the modal from opening too early
+        timeoutId = setTimeout(() => {
+            if ($servers.length === 0) {
+                quickStartModalOpen = true
+            }
+        }, 500)
     })
 
     // Set up an interval to refresh data every few seconds
