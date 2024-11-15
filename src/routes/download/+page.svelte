@@ -8,6 +8,8 @@
     } from "flowbite-svelte-icons"
     import { APP_NAME } from "$lib/constants"
 
+    let twoStep = false;
+
     const downloads = [
         {
             title: "Redis Community Edition & Stack",
@@ -45,6 +47,7 @@
             link: "https://cloud.redis.io/?_gl=1*lh5tc9*_gcl_au*OTc4NjgzMjczLjE3MjY1MTA5NDA.#/rlec-downloads",
         },
     ]
+
 </script>
 
 <div class="flex flex-col gap-2 items-start w-full justify-start p-4">
@@ -55,6 +58,7 @@
     </p>
     <div class="w-full bg-white">
         <div class="flex flex-col items-start justify-start p-4 mx-auto max-w-4xl">
+            {#if twoStep}
             <h1>Redis OSS / Community Edition</h1>
             <div class="grid grid-cols-2 gap-4 p-4 max-w-4xl m-auto">
                 <Card class="flex flex-col items-startjustify-start space-y-4 shadow-none rounded-md">
@@ -72,11 +76,12 @@
                     </a>
                 </Card>
             </div>
+            {/if}
         </div>
         <div
             class="flex flex-col m-auto max-w-4xl space-y-4 w-full items-center justify-center mt-8 bg-white"
         >
-            {#each downloads.slice(2) as download}
+            {#each downloads.slice(twoStep ? 2 : 0) as download}
                 <Card
                     size="xl"
                     class="flex flex-col w-full items-start border-none shadow-none rounded-none dark:bg-slate-700 dark:border-slate-300"

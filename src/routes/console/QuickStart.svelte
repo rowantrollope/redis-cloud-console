@@ -4,7 +4,8 @@
     import { Modal } from "flowbite-svelte"
     import AddDatabase from "../../components/AddDatabase/AddDatabase.svelte"
     import { APP_NAME } from "$lib/constants"
-    
+    import { ArrowRightOutline } from "flowbite-svelte-icons"
+
     export let open = false
 
     const dispatch = createEventDispatcher()
@@ -38,9 +39,13 @@
             Get started by adding your Redis instance and experience the power
             of {APP_NAME}.
         </p>
+        <a href="/how-it-works" class="no-outline-button">
+            See how it works
+            <ArrowRightOutline class="w-5 h-5 ms-2" />
+        </a>
     </div>
-    <div slot="footer" class="flex items-end w-full">
-        <button on:click={addDatabase} class="w-full lime-button">
+    <div slot="footer" class="flex items-center justify-end w-full">
+        <button on:click={addDatabase} class="lime-button">
             Add Database
         </button>
     </div>
